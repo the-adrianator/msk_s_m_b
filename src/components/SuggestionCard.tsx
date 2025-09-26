@@ -13,11 +13,11 @@ interface SuggestionCardProps {
   onUpdate: (suggestion: Suggestion) => void;
 }
 
-export default function SuggestionCard({ 
-  suggestion, 
-  employee, 
-  admin, 
-  onUpdate 
+export default function SuggestionCard({
+  suggestion,
+  employee,
+  admin,
+  onUpdate,
 }: SuggestionCardProps) {
   const getStatusBadge = (suggestion: Suggestion) => {
     const isOverdueSuggestion = isOverdue(
@@ -100,9 +100,7 @@ export default function SuggestionCard({
             {employee.jobTitle} • {employee.department}
           </p>
         </div>
-        <div className="ml-4">
-          {getStatusBadge(suggestion)}
-        </div>
+        <div className="ml-4">{getStatusBadge(suggestion)}</div>
       </div>
 
       {/* Description */}
@@ -136,7 +134,9 @@ export default function SuggestionCard({
         {suggestion.notes && (
           <div>
             <span className="font-medium">Notes:</span>
-            <p className="mt-1 text-gray-600 dark:text-gray-300">{suggestion.notes}</p>
+            <p className="mt-1 text-gray-600 dark:text-gray-300">
+              {suggestion.notes}
+            </p>
           </div>
         )}
       </div>

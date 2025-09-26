@@ -18,6 +18,8 @@ import PermissionGuard from './PermissionGuard';
 import StatusUpdateModal from './StatusUpdateModal';
 import SuggestionCard from './SuggestionCard';
 import EmployeeDrawer from './EmployeeDrawer';
+import CreateSuggestionModal from './CreateSuggestionModal';
+import Toast from './Toast';
 
 interface SuggestionTableProps {
   admin: AdminUser;
@@ -37,8 +39,16 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
   const [selectedSuggestion, setSelectedSuggestion] =
     useState<Suggestion | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null
+  );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; isVisible: boolean }>({
+    message: '',
+    type: 'info',
+    isVisible: false,
+  });
 
   // Load data on mount
   useEffect(() => {
@@ -106,6 +116,23 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
   const handleCloseEmployeeDrawer = () => {
     setIsDrawerOpen(false);
     setSelectedEmployee(null);
+  };
+
+  const handleCreateSuggestion = (newSuggestion: Suggestion) => {
+    setSuggestions(prev => [newSuggestion, ...prev]);
+    setToast({
+      message: 'Suggestion created successfully!',
+      type: 'success',
+      isVisible: true,
+    });
+  };
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type, isVisible: true });
+  };
+
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, isVisible: false }));
   };
 
   const getEmployeeName = (employeeId: string) => {
@@ -285,12 +312,23 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
         </div>
       </div>
 
-      {/* Results Summary */}
+      {/* Results Summary and Actions */}
       <div className="flex justify-between items-center">
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Showing {filteredSuggestions.length} of {suggestions.length}{' '}
           suggestions
         </p>
+        <PermissionGuard permission="create_suggestions" admin={admin}>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create Suggestion
+          </button>
+        </PermissionGuard>
       </div>
 
       {/* Desktop Table View */}
@@ -367,7 +405,9 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                   <button
                     onClick={() => {
-                      const employee = employees.find(emp => emp.id === suggestion.employeeId);
+                      const employee = employees.find(
+                        emp => emp.id === suggestion.employeeId
+                      );
                       if (employee) handleOpenEmployeeDrawer(employee);
                     }}
                     className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
@@ -414,9 +454,11 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
         {filteredSuggestions.map(suggestion => {
-          const employee = employees.find(emp => emp.id === suggestion.employeeId);
+          const employee = employees.find(
+            emp => emp.id === suggestion.employeeId
+          );
           if (!employee) return null;
-          
+
           return (
             <SuggestionCard
               key={suggestion.id}
@@ -452,6 +494,22 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
         employee={selectedEmployee}
         isOpen={isDrawerOpen}
         onClose={handleCloseEmployeeDrawer}
+      />
+
+      {/* Create Suggestion Modal */}
+      <CreateSuggestionModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={handleCreateSuggestion}
+        admin={admin}
+      />
+
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
       />
     </div>
   );

@@ -99,11 +99,10 @@ export default function App() {
 
         <div className="mt-8 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
           <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
-            Stage 3 Complete: Dashboard (Desktop)
+            Stage 5 Complete: Create Suggestion Flow
           </h3>
           <p className="text-green-700 dark:text-green-200 text-sm">
-            The main dashboard is now functional with filters, search, sorting,
-            and status updates using the expanded sample data.
+            The application now includes full CRUD functionality with create suggestion modal, form validation, optimistic UI updates, and toast notifications.
           </p>
         </div>
       </div>
