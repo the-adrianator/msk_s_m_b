@@ -1,0 +1,56 @@
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  darkMode: 'class', // Use class strategy for dark mode as specified in PRD
+  theme: {
+    extend: {
+      colors: {
+        // Professional blue/grey palette with status-specific accent colours
+        primary: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+        },
+        // Status colours for suggestions
+        status: {
+          pending: '#6b7280', // neutral grey
+          in_progress: '#3b82f6', // info blue
+          completed: '#10b981', // success green
+          dismissed: '#ef4444', // destructive red
+        },
+        // Dark theme backgrounds
+        dark: {
+          bg: '#1a1a1a',
+          surface: '#2d2d2d',
+        }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      animation: {
+        'theme-transition': 'theme-transition 200ms ease-in-out',
+      },
+      keyframes: {
+        'theme-transition': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
+    },
+  },
+  plugins: [],
+}
+
+export default config
