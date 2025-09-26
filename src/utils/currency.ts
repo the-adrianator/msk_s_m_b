@@ -30,7 +30,7 @@ export function parseCurrency(currencyString: string): number | null {
   // Remove £ symbol and parse
   const cleanValue = currencyString.replace(/£/g, '').trim();
   const numericValue = parseFloat(cleanValue);
-  
+
   return isNaN(numericValue) ? null : numericValue;
 }
 

@@ -10,7 +10,7 @@ export function filterSuggestions(
   suggestions: Suggestion[],
   filters: SuggestionFilters
 ): Suggestion[] {
-  return suggestions.filter((suggestion) => {
+  return suggestions.filter(suggestion => {
     // Employee filter
     if (filters.employee && suggestion.employeeId !== filters.employee) {
       return false;
@@ -65,14 +65,20 @@ export function sortSuggestions(
 
     switch (field) {
       case 'dateUpdated':
-        comparison = new Date(a.dateUpdated).getTime() - new Date(b.dateUpdated).getTime();
+        comparison =
+          new Date(a.dateUpdated).getTime() - new Date(b.dateUpdated).getTime();
         break;
       case 'priority':
         const priorityOrder = { high: 3, medium: 2, low: 1 };
         comparison = priorityOrder[a.priority] - priorityOrder[b.priority];
         break;
       case 'status':
-        const statusOrder = { pending: 1, in_progress: 2, completed: 3, dismissed: 4 };
+        const statusOrder = {
+          pending: 1,
+          in_progress: 2,
+          completed: 3,
+          dismissed: 4,
+        };
         comparison = statusOrder[a.status] - statusOrder[b.status];
         break;
     }

@@ -16,7 +16,9 @@ export function isOverdue(
 
   const createdDate = new Date(dateCreated);
   const now = new Date();
-  const daysDiff = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+  const daysDiff = Math.floor(
+    (now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
 
   return daysDiff > thresholdDays;
 }

@@ -1,4 +1,9 @@
-import { isOverdue, formatDate, formatDateTime, getRelativeTime } from '../dates';
+import {
+  isOverdue,
+  formatDate,
+  formatDateTime,
+  getRelativeTime,
+} from '../dates';
 
 describe('isOverdue', () => {
   it('should return false for non-pending status', () => {
@@ -7,13 +12,17 @@ describe('isOverdue', () => {
   });
 
   it('should return false for recent pending suggestions', () => {
-    const recentDate = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(); // 10 days ago
+    const recentDate = new Date(
+      Date.now() - 10 * 24 * 60 * 60 * 1000
+    ).toISOString(); // 10 days ago
     const result = isOverdue(recentDate, 'pending', 30);
     expect(result).toBe(false);
   });
 
   it('should return true for old pending suggestions', () => {
-    const oldDate = new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(); // 35 days ago
+    const oldDate = new Date(
+      Date.now() - 35 * 24 * 60 * 60 * 1000
+    ).toISOString(); // 35 days ago
     const result = isOverdue(oldDate, 'pending', 30);
     expect(result).toBe(true);
   });
@@ -69,13 +78,17 @@ describe('getRelativeTime', () => {
   });
 
   it('should return days ago for much older times', () => {
-    const muchOlderTime = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(); // 3 days ago
+    const muchOlderTime = new Date(
+      Date.now() - 3 * 24 * 60 * 60 * 1000
+    ).toISOString(); // 3 days ago
     const result = getRelativeTime(muchOlderTime);
     expect(result).toBe('3 days ago');
   });
 
   it('should return formatted date for very old times', () => {
-    const veryOldTime = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(); // 10 days ago
+    const veryOldTime = new Date(
+      Date.now() - 10 * 24 * 60 * 60 * 1000
+    ).toISOString(); // 10 days ago
     const result = getRelativeTime(veryOldTime);
     expect(result).toMatch(/\d{2}\/\d{2}\/\d{4}/); // Should match DD/MM/YYYY format
   });

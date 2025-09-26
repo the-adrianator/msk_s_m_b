@@ -10,11 +10,15 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-export default function DashboardLayout({ admin, onLogout, children }: DashboardLayoutProps) {
+export default function DashboardLayout({
+  admin,
+  onLogout,
+  children,
+}: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header admin={admin} onLogout={onLogout} />
-      
+
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           {/* Welcome message with role-based content */}
@@ -30,8 +34,8 @@ export default function DashboardLayout({ admin, onLogout, children }: Dashboard
           {/* Permission-based content sections */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {/* Create Suggestions Card */}
-            <PermissionGuard 
-              permission="create_suggestions" 
+            <PermissionGuard
+              permission="create_suggestions"
               admin={admin}
               fallback={
                 <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -39,7 +43,7 @@ export default function DashboardLayout({ admin, onLogout, children }: Dashboard
                     Create Suggestions
                   </h3>
                   <p className="text-sm text-gray-400 dark:text-gray-500">
-                    You don't have permission to create suggestions
+                    You don&apos;t have permission to create suggestions
                   </p>
                 </div>
               }
@@ -58,8 +62,8 @@ export default function DashboardLayout({ admin, onLogout, children }: Dashboard
             </PermissionGuard>
 
             {/* Update Status Card */}
-            <PermissionGuard 
-              permission="update_status" 
+            <PermissionGuard
+              permission="update_status"
               admin={admin}
               fallback={
                 <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -67,7 +71,7 @@ export default function DashboardLayout({ admin, onLogout, children }: Dashboard
                     Update Status
                   </h3>
                   <p className="text-sm text-gray-400 dark:text-gray-500">
-                    You don't have permission to update suggestion status
+                    You don&apos;t have permission to update suggestion status
                   </p>
                 </div>
               }
@@ -86,8 +90,8 @@ export default function DashboardLayout({ admin, onLogout, children }: Dashboard
             </PermissionGuard>
 
             {/* View All Card */}
-            <PermissionGuard 
-              permission="view_all" 
+            <PermissionGuard
+              permission="view_all"
               admin={admin}
               fallback={
                 <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -95,7 +99,7 @@ export default function DashboardLayout({ admin, onLogout, children }: Dashboard
                     View Data
                   </h3>
                   <p className="text-sm text-gray-400 dark:text-gray-500">
-                    You don't have permission to view all data
+                    You don&apos;t have permission to view all data
                   </p>
                 </div>
               }

@@ -1,4 +1,8 @@
-import { Suggestion, CreateSuggestionData, UpdateSuggestionData } from '@/types';
+import {
+  Suggestion,
+  CreateSuggestionData,
+  UpdateSuggestionData,
+} from '@/types';
 
 // Mock suggestion data for testing
 const mockSuggestion: Suggestion = {
@@ -21,7 +25,7 @@ describe('createSuggestion', () => {
       type: 'exercise',
       description: 'Test suggestion',
     };
-    
+
     // Check that all required fields are present
     expect(validData.employeeId).toBeDefined();
     expect(validData.type).toBeDefined();
@@ -34,7 +38,7 @@ describe('createSuggestion', () => {
       type: 'exercise',
       description: 'Test suggestion',
     };
-    
+
     // In a real implementation, these would be set by the service
     const expectedDefaults = {
       status: 'pending',
@@ -43,7 +47,7 @@ describe('createSuggestion', () => {
       dateCreated: expect.any(String),
       dateUpdated: expect.any(String),
     };
-    
+
     // This test verifies the structure we expect
     expect(suggestionData).toMatchObject({
       employeeId: 'emp1',
@@ -61,7 +65,7 @@ describe('createSuggestion', () => {
       notes: 'Additional notes',
       estimatedCost: '£50.00',
     };
-    
+
     expect(suggestionData.priority).toBe('medium');
     expect(suggestionData.notes).toBe('Additional notes');
     expect(suggestionData.estimatedCost).toBe('£50.00');
@@ -73,17 +77,17 @@ describe('updateStatus', () => {
     const updateData: UpdateSuggestionData = {
       status: 'in_progress',
     };
-    
+
     // Mock the current suggestion
     const currentSuggestion = { ...mockSuggestion };
-    
+
     // Simulate the update logic
     const updatedSuggestion = {
       ...currentSuggestion,
       ...updateData,
       dateUpdated: new Date().toISOString(),
     };
-    
+
     expect(updatedSuggestion.status).toBe('in_progress');
     expect(updatedSuggestion.dateUpdated).toBeDefined();
     expect(new Date(updatedSuggestion.dateUpdated).getTime()).toBeGreaterThan(
@@ -95,17 +99,17 @@ describe('updateStatus', () => {
     const updateData: UpdateSuggestionData = {
       status: 'completed',
     };
-    
+
     const currentSuggestion = { ...mockSuggestion };
     const now = new Date().toISOString();
-    
+
     const updatedSuggestion = {
       ...currentSuggestion,
       ...updateData,
       dateUpdated: now,
       dateCompleted: now,
     };
-    
+
     expect(updatedSuggestion.status).toBe('completed');
     expect(updatedSuggestion.dateCompleted).toBe(now);
   });
@@ -114,16 +118,16 @@ describe('updateStatus', () => {
     const updateData: UpdateSuggestionData = {
       status: 'in_progress',
     };
-    
+
     const currentSuggestion = { ...mockSuggestion };
     const now = new Date().toISOString();
-    
+
     const updatedSuggestion = {
       ...currentSuggestion,
       ...updateData,
       dateUpdated: now,
     };
-    
+
     expect(updatedSuggestion.status).toBe('in_progress');
     expect(updatedSuggestion.dateCompleted).toBeUndefined();
   });
@@ -134,17 +138,17 @@ describe('updateStatus', () => {
       notes: 'Updated notes',
       estimatedCost: '£100.00',
     };
-    
+
     const currentSuggestion = { ...mockSuggestion };
     const now = new Date().toISOString();
-    
+
     const updatedSuggestion = {
       ...currentSuggestion,
       ...updateData,
       dateUpdated: now,
       dateCompleted: now,
     };
-    
+
     expect(updatedSuggestion.status).toBe('completed');
     expect(updatedSuggestion.notes).toBe('Updated notes');
     expect(updatedSuggestion.estimatedCost).toBe('£100.00');
@@ -155,36 +159,48 @@ describe('updateStatus', () => {
 describe('suggestion validation', () => {
   it('should validate suggestion type', () => {
     const validTypes = ['exercise', 'equipment', 'behavioural', 'lifestyle'];
-    
+
     validTypes.forEach(type => {
-      const suggestion = { ...mockSuggestion, type: type as any };
+      const suggestion = {
+        ...mockSuggestion,
+        type: type as 'exercise' | 'equipment' | 'behavioural' | 'lifestyle',
+      };
       expect(validTypes).toContain(suggestion.type);
     });
   });
 
   it('should validate suggestion status', () => {
     const validStatuses = ['pending', 'in_progress', 'completed', 'dismissed'];
-    
+
     validStatuses.forEach(status => {
-      const suggestion = { ...mockSuggestion, status: status as any };
+      const suggestion = {
+        ...mockSuggestion,
+        status: status as 'pending' | 'in_progress' | 'completed' | 'dismissed',
+      };
       expect(validStatuses).toContain(suggestion.status);
     });
   });
 
   it('should validate suggestion priority', () => {
     const validPriorities = ['low', 'medium', 'high'];
-    
+
     validPriorities.forEach(priority => {
-      const suggestion = { ...mockSuggestion, priority: priority as any };
+      const suggestion = {
+        ...mockSuggestion,
+        priority: priority as 'low' | 'medium' | 'high',
+      };
       expect(validPriorities).toContain(suggestion.priority);
     });
   });
 
   it('should validate suggestion source', () => {
     const validSources = ['vida', 'admin'];
-    
+
     validSources.forEach(source => {
-      const suggestion = { ...mockSuggestion, source: source as any };
+      const suggestion = {
+        ...mockSuggestion,
+        source: source as 'vida' | 'admin',
+      };
       expect(validSources).toContain(suggestion.source);
     });
   });

@@ -11,11 +11,11 @@ interface PermissionGuardProps {
   fallback?: ReactNode;
 }
 
-export default function PermissionGuard({ 
-  children, 
-  permission, 
-  admin, 
-  fallback = null 
+export default function PermissionGuard({
+  children,
+  permission,
+  admin: _admin,
+  fallback = null,
 }: PermissionGuardProps) {
   const hasRequiredPermission = hasPermission(permission);
 
@@ -27,23 +27,43 @@ export default function PermissionGuard({
 }
 
 // Convenience components for common permissions
-export function CreateSuggestionGuard({ children, admin, fallback }: Omit<PermissionGuardProps, 'permission'>) {
+export function CreateSuggestionGuard({
+  children,
+  admin,
+  fallback,
+}: Omit<PermissionGuardProps, 'permission'>) {
   return (
-    <PermissionGuard permission="create_suggestions" admin={admin} fallback={fallback}>
+    <PermissionGuard
+      permission="create_suggestions"
+      admin={admin}
+      fallback={fallback}
+    >
       {children}
     </PermissionGuard>
   );
 }
 
-export function UpdateStatusGuard({ children, admin, fallback }: Omit<PermissionGuardProps, 'permission'>) {
+export function UpdateStatusGuard({
+  children,
+  admin,
+  fallback,
+}: Omit<PermissionGuardProps, 'permission'>) {
   return (
-    <PermissionGuard permission="update_status" admin={admin} fallback={fallback}>
+    <PermissionGuard
+      permission="update_status"
+      admin={admin}
+      fallback={fallback}
+    >
       {children}
     </PermissionGuard>
   );
 }
 
-export function ViewAllGuard({ children, admin, fallback }: Omit<PermissionGuardProps, 'permission'>) {
+export function ViewAllGuard({
+  children,
+  admin,
+  fallback,
+}: Omit<PermissionGuardProps, 'permission'>) {
   return (
     <PermissionGuard permission="view_all" admin={admin} fallback={fallback}>
       {children}

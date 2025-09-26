@@ -57,7 +57,12 @@ export interface SortOptions {
 export type Theme = 'light' | 'dark';
 
 // Status badge types for UI
-export type StatusBadgeType = 'pending' | 'in_progress' | 'completed' | 'dismissed' | 'overdue';
+export type StatusBadgeType =
+  | 'pending'
+  | 'in_progress'
+  | 'completed'
+  | 'dismissed'
+  | 'overdue';
 
 // Form data interfaces
 export interface CreateSuggestionData {

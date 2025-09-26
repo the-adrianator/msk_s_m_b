@@ -9,11 +9,14 @@ import {
   query,
   orderBy,
   where,
-  limit,
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Suggestion, CreateSuggestionData, UpdateSuggestionData } from '@/types';
+import {
+  Suggestion,
+  CreateSuggestionData,
+  UpdateSuggestionData,
+} from '@/types';
 
 const COLLECTION_NAME = 'suggestions';
 
@@ -26,14 +29,20 @@ export async function getSuggestions(): Promise<Suggestion[]> {
     const suggestionsRef = collection(db, COLLECTION_NAME);
     const q = query(suggestionsRef, orderBy('dateUpdated', 'desc'));
     const querySnapshot = await getDocs(q);
-    
-    return querySnapshot.docs.map((doc) => ({
+
+    return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       // Convert Firestore timestamps to ISO strings
-      dateCreated: doc.data().dateCreated?.toDate?.()?.toISOString() || doc.data().dateCreated,
-      dateUpdated: doc.data().dateUpdated?.toDate?.()?.toISOString() || doc.data().dateUpdated,
-      dateCompleted: doc.data().dateCompleted?.toDate?.()?.toISOString() || doc.data().dateCompleted,
+      dateCreated:
+        doc.data().dateCreated?.toDate?.()?.toISOString() ||
+        doc.data().dateCreated,
+      dateUpdated:
+        doc.data().dateUpdated?.toDate?.()?.toISOString() ||
+        doc.data().dateUpdated,
+      dateCompleted:
+        doc.data().dateCompleted?.toDate?.()?.toISOString() ||
+        doc.data().dateCompleted,
     })) as Suggestion[];
   } catch (error) {
     console.error('Error fetching suggestions:', error);
@@ -46,23 +55,28 @@ export async function getSuggestions(): Promise<Suggestion[]> {
  * @param suggestionId - Suggestion ID
  * @returns Promise<Suggestion | null> - Suggestion data or null if not found
  */
-export async function getSuggestionById(suggestionId: string): Promise<Suggestion | null> {
+export async function getSuggestionById(
+  suggestionId: string
+): Promise<Suggestion | null> {
   try {
     const suggestionRef = doc(db, COLLECTION_NAME, suggestionId);
     const suggestionSnap = await getDoc(suggestionRef);
-    
+
     if (suggestionSnap.exists()) {
       const data = suggestionSnap.data();
       return {
         id: suggestionSnap.id,
         ...data,
         // Convert Firestore timestamps to ISO strings
-        dateCreated: data.dateCreated?.toDate?.()?.toISOString() || data.dateCreated,
-        dateUpdated: data.dateUpdated?.toDate?.()?.toISOString() || data.dateUpdated,
-        dateCompleted: data.dateCompleted?.toDate?.()?.toISOString() || data.dateCompleted,
+        dateCreated:
+          data.dateCreated?.toDate?.()?.toISOString() || data.dateCreated,
+        dateUpdated:
+          data.dateUpdated?.toDate?.()?.toISOString() || data.dateUpdated,
+        dateCompleted:
+          data.dateCompleted?.toDate?.()?.toISOString() || data.dateCompleted,
       } as Suggestion;
     }
-    
+
     return null;
   } catch (error) {
     console.error('Error fetching suggestion:', error);
@@ -75,7 +89,9 @@ export async function getSuggestionById(suggestionId: string): Promise<Suggestio
  * @param employeeId - Employee ID
  * @returns Promise<Suggestion[]> - Array of suggestions for employee
  */
-export async function getSuggestionsByEmployee(employeeId: string): Promise<Suggestion[]> {
+export async function getSuggestionsByEmployee(
+  employeeId: string
+): Promise<Suggestion[]> {
   try {
     const suggestionsRef = collection(db, COLLECTION_NAME);
     const q = query(
@@ -84,14 +100,20 @@ export async function getSuggestionsByEmployee(employeeId: string): Promise<Sugg
       orderBy('dateUpdated', 'desc')
     );
     const querySnapshot = await getDocs(q);
-    
-    return querySnapshot.docs.map((doc) => ({
+
+    return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       // Convert Firestore timestamps to ISO strings
-      dateCreated: doc.data().dateCreated?.toDate?.()?.toISOString() || doc.data().dateCreated,
-      dateUpdated: doc.data().dateUpdated?.toDate?.()?.toISOString() || doc.data().dateUpdated,
-      dateCompleted: doc.data().dateCompleted?.toDate?.()?.toISOString() || doc.data().dateCompleted,
+      dateCreated:
+        doc.data().dateCreated?.toDate?.()?.toISOString() ||
+        doc.data().dateCreated,
+      dateUpdated:
+        doc.data().dateUpdated?.toDate?.()?.toISOString() ||
+        doc.data().dateUpdated,
+      dateCompleted:
+        doc.data().dateCompleted?.toDate?.()?.toISOString() ||
+        doc.data().dateCompleted,
     })) as Suggestion[];
   } catch (error) {
     console.error('Error fetching suggestions by employee:', error);
@@ -111,7 +133,7 @@ export async function createSuggestion(
 ): Promise<string> {
   try {
     const now = new Date().toISOString();
-    
+
     const suggestionRef = collection(db, COLLECTION_NAME);
     const docRef = await addDoc(suggestionRef, {
       ...suggestionData,
@@ -121,7 +143,7 @@ export async function createSuggestion(
       dateCreated: Timestamp.fromDate(new Date(now)),
       dateUpdated: Timestamp.fromDate(new Date(now)),
     });
-    
+
     return docRef.id;
   } catch (error) {
     console.error('Error creating suggestion:', error);
@@ -142,17 +164,24 @@ export async function updateSuggestion(
   try {
     const suggestionRef = doc(db, COLLECTION_NAME, suggestionId);
     const now = new Date().toISOString();
-    
-    const updateFields: any = {
+
+    const updateFields: Record<string, unknown> = {
       ...updateData,
       dateUpdated: Timestamp.fromDate(new Date(now)),
     };
-    
+
     // If status is being set to completed, set dateCompleted
     if (updateData.status === 'completed') {
       updateFields.dateCompleted = Timestamp.fromDate(new Date(now));
     }
-    
+
+    // Remove undefined values to avoid Firestore errors
+    Object.keys(updateFields).forEach(key => {
+      if (updateFields[key] === undefined) {
+        delete updateFields[key];
+      }
+    });
+
     await updateDoc(suggestionRef, updateFields);
   } catch (error) {
     console.error('Error updating suggestion:', error);
@@ -191,14 +220,20 @@ export async function getSuggestionsByStatus(
       orderBy('dateUpdated', 'desc')
     );
     const querySnapshot = await getDocs(q);
-    
-    return querySnapshot.docs.map((doc) => ({
+
+    return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       // Convert Firestore timestamps to ISO strings
-      dateCreated: doc.data().dateCreated?.toDate?.()?.toISOString() || doc.data().dateCreated,
-      dateUpdated: doc.data().dateUpdated?.toDate?.()?.toISOString() || doc.data().dateUpdated,
-      dateCompleted: doc.data().dateCompleted?.toDate?.()?.toISOString() || doc.data().dateCompleted,
+      dateCreated:
+        doc.data().dateCreated?.toDate?.()?.toISOString() ||
+        doc.data().dateCreated,
+      dateUpdated:
+        doc.data().dateUpdated?.toDate?.()?.toISOString() ||
+        doc.data().dateUpdated,
+      dateCompleted:
+        doc.data().dateCompleted?.toDate?.()?.toISOString() ||
+        doc.data().dateCompleted,
     })) as Suggestion[];
   } catch (error) {
     console.error('Error fetching suggestions by status:', error);

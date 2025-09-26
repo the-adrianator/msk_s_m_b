@@ -6,7 +6,6 @@ import {
   query,
   orderBy,
   where,
-  limit,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Employee } from '@/types';
@@ -22,8 +21,8 @@ export async function getEmployees(): Promise<Employee[]> {
     const employeesRef = collection(db, COLLECTION_NAME);
     const q = query(employeesRef, orderBy('name', 'asc'));
     const querySnapshot = await getDocs(q);
-    
-    return querySnapshot.docs.map((doc) => ({
+
+    return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
     })) as Employee[];
@@ -38,18 +37,20 @@ export async function getEmployees(): Promise<Employee[]> {
  * @param employeeId - Employee ID
  * @returns Promise<Employee | null> - Employee data or null if not found
  */
-export async function getEmployeeById(employeeId: string): Promise<Employee | null> {
+export async function getEmployeeById(
+  employeeId: string
+): Promise<Employee | null> {
   try {
     const employeeRef = doc(db, COLLECTION_NAME, employeeId);
     const employeeSnap = await getDoc(employeeRef);
-    
+
     if (employeeSnap.exists()) {
       return {
         id: employeeSnap.id,
         ...employeeSnap.data(),
       } as Employee;
     }
-    
+
     return null;
   } catch (error) {
     console.error('Error fetching employee:', error);
@@ -62,7 +63,9 @@ export async function getEmployeeById(employeeId: string): Promise<Employee | nu
  * @param department - Department name
  * @returns Promise<Employee[]> - Array of employees in department
  */
-export async function getEmployeesByDepartment(department: string): Promise<Employee[]> {
+export async function getEmployeesByDepartment(
+  department: string
+): Promise<Employee[]> {
   try {
     const employeesRef = collection(db, COLLECTION_NAME);
     const q = query(
@@ -71,8 +74,8 @@ export async function getEmployeesByDepartment(department: string): Promise<Empl
       orderBy('name', 'asc')
     );
     const querySnapshot = await getDocs(q);
-    
-    return querySnapshot.docs.map((doc) => ({
+
+    return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
     })) as Employee[];
@@ -87,7 +90,9 @@ export async function getEmployeesByDepartment(department: string): Promise<Empl
  * @param riskLevel - Risk level to filter by
  * @returns Promise<Employee[]> - Array of employees with specified risk level
  */
-export async function getEmployeesByRiskLevel(riskLevel: 'high' | 'medium' | 'low'): Promise<Employee[]> {
+export async function getEmployeesByRiskLevel(
+  riskLevel: 'high' | 'medium' | 'low'
+): Promise<Employee[]> {
   try {
     const employeesRef = collection(db, COLLECTION_NAME);
     const q = query(
@@ -96,8 +101,8 @@ export async function getEmployeesByRiskLevel(riskLevel: 'high' | 'medium' | 'lo
       orderBy('name', 'asc')
     );
     const querySnapshot = await getDocs(q);
-    
-    return querySnapshot.docs.map((doc) => ({
+
+    return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
     })) as Employee[];

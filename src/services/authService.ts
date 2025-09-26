@@ -28,25 +28,31 @@ const MOCK_ADMINS: AdminUser[] = [
  * @param password - User password (any password works in mock)
  * @returns Promise<AdminUser | null> - Admin user if valid, null if invalid
  */
-export async function mockSignIn(email: string, password: string): Promise<AdminUser | null> {
+export async function mockSignIn(
+  email: string,
+  _password: string
+): Promise<AdminUser | null> {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   // Find admin by email (password validation is mocked)
   const admin = MOCK_ADMINS.find(a => a.email === email);
-  
+
   if (admin) {
     // Store session in localStorage
     if (typeof window !== 'undefined') {
-      localStorage.setItem('adminSession', JSON.stringify({
-        user: admin,
-        timestamp: Date.now(),
-      }));
+      localStorage.setItem(
+        'adminSession',
+        JSON.stringify({
+          user: admin,
+          timestamp: Date.now(),
+        })
+      );
     }
-    
+
     return admin;
   }
-  
+
   return null;
 }
 
@@ -58,24 +64,24 @@ export function getCurrentAdmin(): AdminUser | null {
   if (typeof window === 'undefined') {
     return null;
   }
-  
+
   try {
     const session = localStorage.getItem('adminSession');
     if (!session) {
       return null;
     }
-    
+
     const { user, timestamp } = JSON.parse(session);
-    
+
     // Check if session is still valid (24 hours)
     const sessionAge = Date.now() - timestamp;
     const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-    
+
     if (sessionAge > maxAge) {
       localStorage.removeItem('adminSession');
       return null;
     }
-    
+
     return user;
   } catch (error) {
     console.error('Error getting current admin:', error);
