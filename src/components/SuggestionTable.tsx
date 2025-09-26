@@ -16,6 +16,8 @@ import { formatCurrency } from '@/utils/currency';
 import { AdminUser } from '@/types';
 import PermissionGuard from './PermissionGuard';
 import StatusUpdateModal from './StatusUpdateModal';
+import SuggestionCard from './SuggestionCard';
+import EmployeeDrawer from './EmployeeDrawer';
 
 interface SuggestionTableProps {
   admin: AdminUser;
@@ -35,6 +37,8 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
   const [selectedSuggestion, setSelectedSuggestion] =
     useState<Suggestion | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Load data on mount
   useEffect(() => {
@@ -92,6 +96,16 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedSuggestion(null);
+  };
+
+  const handleOpenEmployeeDrawer = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setIsDrawerOpen(true);
+  };
+
+  const handleCloseEmployeeDrawer = () => {
+    setIsDrawerOpen(false);
+    setSelectedEmployee(null);
   };
 
   const getEmployeeName = (employeeId: string) => {
@@ -279,8 +293,8 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
         </p>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
@@ -351,7 +365,15 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  {getEmployeeName(suggestion.employeeId)}
+                  <button
+                    onClick={() => {
+                      const employee = employees.find(emp => emp.id === suggestion.employeeId);
+                      if (employee) handleOpenEmployeeDrawer(employee);
+                    }}
+                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                  >
+                    {getEmployeeName(suggestion.employeeId)}
+                  </button>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
                   <div
@@ -389,6 +411,24 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
         </table>
       </div>
 
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-4">
+        {filteredSuggestions.map(suggestion => {
+          const employee = employees.find(emp => emp.id === suggestion.employeeId);
+          if (!employee) return null;
+          
+          return (
+            <SuggestionCard
+              key={suggestion.id}
+              suggestion={suggestion}
+              employee={employee}
+              admin={admin}
+              onUpdate={handleOpenModal}
+            />
+          );
+        })}
+      </div>
+
       {filteredSuggestions.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500 dark:text-gray-400">
@@ -406,6 +446,13 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
           onUpdate={handleUpdateSuggestion}
         />
       )}
+
+      {/* Employee Drawer */}
+      <EmployeeDrawer
+        employee={selectedEmployee}
+        isOpen={isDrawerOpen}
+        onClose={handleCloseEmployeeDrawer}
+      />
     </div>
   );
 }

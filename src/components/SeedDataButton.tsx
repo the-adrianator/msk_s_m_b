@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { seedFirestoreData } from '@/scripts/seedData';
+import { seedFirestoreData, clearFirestoreData } from '@/scripts/seedData';
 
 export default function SeedDataButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +23,24 @@ export default function SeedDataButton() {
     }
   };
 
+  const handleClearAndReseed = async () => {
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      // Note: In a real app, you'd implement proper batch deletion
+      setMessage(
+        'Please clear data manually from Firebase Console, then click "Seed Sample Data" to avoid duplicates.'
+      );
+    } catch (error) {
+      setMessage(
+        `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="p-4 border rounded-lg">
       <h3 className="text-lg font-semibold mb-2">Firestore Data Seeding</h3>
@@ -32,13 +50,23 @@ export default function SeedDataButton() {
         .env.local
       </p>
 
-      <button
-        onClick={handleSeedData}
-        disabled={isLoading}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isLoading ? 'Seeding...' : 'Seed Sample Data'}
-      </button>
+      <div className="space-x-2">
+        <button
+          onClick={handleSeedData}
+          disabled={isLoading}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? 'Seeding...' : 'Seed Sample Data'}
+        </button>
+
+        <button
+          onClick={handleClearAndReseed}
+          disabled={isLoading}
+          className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Clear & Reseed
+        </button>
+      </div>
 
       {message && (
         <div
