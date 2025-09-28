@@ -14,10 +14,10 @@ interface PermissionGuardProps {
 export default function PermissionGuard({
   children,
   permission,
-  admin,
+  admin: _admin,
   fallback = null,
 }: PermissionGuardProps) {
-  const hasRequiredPermission = hasPermission(permission, admin);
+  const hasRequiredPermission = hasPermission(permission);
 
   if (!hasRequiredPermission) {
     return <>{fallback}</>;
