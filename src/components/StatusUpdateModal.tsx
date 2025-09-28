@@ -5,7 +5,6 @@ import { Suggestion, UpdateSuggestionData } from '@/types';
 import { updateSuggestion } from '@/services/suggestionService';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
-  getThemeCardClasses,
   getThemeTextClasses,
   getThemeBorderClasses,
 } from '@/utils/themeClasses';

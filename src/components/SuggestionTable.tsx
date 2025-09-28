@@ -676,7 +676,6 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
         employee={selectedEmployee}
         isOpen={isDrawerOpen}
         onClose={handleCloseEmployeeDrawer}
-        admin={admin}
       />
 
       {/* Create Suggestion Modal */}

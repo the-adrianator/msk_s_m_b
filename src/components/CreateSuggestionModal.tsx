@@ -7,7 +7,6 @@ import { createSuggestion } from '@/services/suggestionService';
 import { AdminUser, Suggestion } from '@/types';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
-  getThemeCardClasses,
   getThemeTextClasses,
   getThemeBorderClasses,
 } from '@/utils/themeClasses';

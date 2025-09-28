@@ -6,7 +6,6 @@ import { formatCurrency } from '@/utils/currency';
 import PermissionGuard from './PermissionGuard';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
-  getThemeCardClasses,
   getThemeTextClasses,
   getThemeBorderClasses,
 } from '@/utils/themeClasses';

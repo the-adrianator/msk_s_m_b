@@ -17,7 +17,7 @@ export default function PermissionGuard({
   admin,
   fallback = null,
 }: PermissionGuardProps) {
-  const hasRequiredPermission = hasPermission(permission);
+  const hasRequiredPermission = hasPermission(permission, admin);
 
   if (!hasRequiredPermission) {
     return <>{fallback}</>;

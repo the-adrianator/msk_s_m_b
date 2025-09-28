@@ -1,4 +1,8 @@
-export function getThemeClasses(lightClass: string, darkClass: string, theme: 'light' | 'dark') {
+export function getThemeClasses(
+  lightClass: string,
+  darkClass: string,
+  theme: 'light' | 'dark'
+) {
   return theme === 'dark' ? darkClass : lightClass;
 }
 

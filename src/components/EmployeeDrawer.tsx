@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Employee, Suggestion, AdminUser } from '@/types';
+import { Employee, Suggestion } from '@/types';
 import { getSuggestionsByEmployee } from '@/services/suggestionService';
 import { formatDate } from '@/utils/dates';
 import { formatCurrency } from '@/utils/currency';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
-  getThemeCardClasses,
   getThemeTextClasses,
   getThemeBorderClasses,
 } from '@/utils/themeClasses';
@@ -17,14 +16,12 @@ interface EmployeeDrawerProps {
   employee: Employee | null;
   isOpen: boolean;
   onClose: () => void;
-  admin: AdminUser;
 }
 
 export default function EmployeeDrawer({
   employee,
   isOpen,
   onClose,
-  admin,
 }: EmployeeDrawerProps) {
   const { theme } = useTheme();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
