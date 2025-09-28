@@ -20,6 +20,9 @@ import SuggestionCard from './SuggestionCard';
 import EmployeeDrawer from './EmployeeDrawer';
 import CreateSuggestionModal from './CreateSuggestionModal';
 import Toast from './Toast';
+import EmptyState from './EmptyState';
+import { TableSkeleton, CardSkeleton } from './LoadingSkeleton';
+import SuggestionTableData from './SuggestionTableData';
 
 interface SuggestionTableProps {
   admin: AdminUser;
@@ -44,7 +47,12 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
   );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; isVisible: boolean }>({
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [toast, setToast] = useState<{
+    message: string;
+    type: 'success' | 'error' | 'info';
+    isVisible: boolean;
+  }>({
     message: '',
     type: 'info',
     isVisible: false,
@@ -74,10 +82,10 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
 
   // Apply filters and sorting when data or filters change
   useEffect(() => {
-    let filtered = filterSuggestions(suggestions, filters);
+    let filtered = filterSuggestions(suggestions, filters, employees);
     filtered = sortSuggestions(filtered, sortField, sortDirection);
     setFilteredSuggestions(filtered);
-  }, [suggestions, filters, sortField, sortDirection]);
+  }, [suggestions, filters, sortField, sortDirection, employees]);
 
   const handleFilterChange = (newFilters: Partial<SuggestionFilters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
@@ -211,39 +219,107 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="hidden md:block">
+          <TableSkeleton />
+        </div>
+        <div className="md:hidden">
+          <CardSkeleton />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="text-red-600 dark:text-red-400 mb-4">{error}</div>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          Retry
-        </button>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <EmptyState
+          title="Something went wrong"
+          description={error}
+          icon={
+            <svg
+              className="w-12 h-12 text-red-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          }
+          action={
+            <div className="space-x-3">
+              <button
+                onClick={() => window.location.reload()}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Retry
+              </button>
+              <button
+                onClick={() => {
+                  setError(null);
+                  setIsLoading(true);
+                  // Retry loading data
+                  const loadData = async () => {
+                    try {
+                      const [fetchedSuggestions, fetchedEmployees] =
+                        await Promise.all([getSuggestions(), getEmployees()]);
+                      setSuggestions(fetchedSuggestions);
+                      setEmployees(fetchedEmployees);
+                    } catch (err: unknown) {
+                      const errorMessage =
+                        err instanceof Error
+                          ? err.message
+                          : 'Failed to load data.';
+                      setError(errorMessage);
+                      console.error('Error loading data:', err);
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  };
+                  loadData();
+                }}
+                className="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                Try Again
+              </button>
+            </div>
+          }
+        />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {/* Filters and Search */}
       <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Search
+              Search All
             </label>
             <input
               type="text"
-              placeholder="Search descriptions..."
+              placeholder="Search names, descriptions, status, priority..."
               value={filters.search || ''}
               onChange={e => handleFilterChange({ search: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
@@ -313,143 +389,133 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
       </div>
 
       {/* Results Summary and Actions */}
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+      <div className="flex flex-col md:flex-row justify-between items-center">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 md:mb-0">
           Showing {filteredSuggestions.length} of {suggestions.length}{' '}
           suggestions
         </p>
-        <PermissionGuard permission="create_suggestions" admin={admin}>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Create Suggestion
-          </button>
-        </PermissionGuard>
+        <div className="flex items-center space-x-3">
+          {/* View Toggle Button */}
+          <div className="hidden md:flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('table')}
+              className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                viewMode === 'table'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <svg
+                className="w-4 h-4 mr-1.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 10h18M3 14h18m-9-4v8m-7 4V4a1 1 0 011-1h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1z"
+                />
+              </svg>
+              Table
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <svg
+                className="w-4 h-4 mr-1.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                />
+              </svg>
+              Grid
+            </button>
+          </div>
+
+          <PermissionGuard permission="create_suggestions" admin={admin}>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="inline-flex items-center px-4 py-1.5 md:py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Create Suggestion
+            </button>
+          </PermissionGuard>
+        </div>
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => handleSort('dateUpdated')}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Last Updated</span>
-                  {sortField === 'dateUpdated' && (
-                    <span>{sortDirection === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Employee
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Description
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Category
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => handleSort('status')}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Status</span>
-                  {sortField === 'status' && (
-                    <span>{sortDirection === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Source
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => handleSort('priority')}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>Priority</span>
-                  {sortField === 'priority' && (
-                    <span>{sortDirection === 'asc' ? '↑' : '↓'}</span>
-                  )}
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {filteredSuggestions.map(suggestion => (
-              <tr
-                key={suggestion.id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  <div>
-                    <div className="font-medium">
-                      {formatDate(suggestion.dateUpdated)}
-                    </div>
-                    <div className="text-gray-500 dark:text-gray-400 text-xs">
-                      {getRelativeTime(suggestion.dateUpdated)}
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  <button
-                    onClick={() => {
-                      const employee = employees.find(
-                        emp => emp.id === suggestion.employeeId
-                      );
-                      if (employee) handleOpenEmployeeDrawer(employee);
-                    }}
-                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-                  >
-                    {getEmployeeName(suggestion.employeeId)}
-                  </button>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                  <div
-                    className="max-w-xs truncate"
-                    title={suggestion.description}
-                  >
-                    {suggestion.description}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {getTypeBadge(suggestion.type)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {getStatusBadge(suggestion)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  <span className="capitalize">{suggestion.source}</span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {getPriorityBadge(suggestion.priority)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <PermissionGuard permission="update_status" admin={admin}>
-                    <button
-                      onClick={() => handleOpenModal(suggestion)}
-                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                    >
-                      Update
-                    </button>
-                  </PermissionGuard>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {viewMode === 'table' && (
+        <SuggestionTableData
+          filteredSuggestions={filteredSuggestions}
+          employees={employees}
+          admin={admin}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          handleSort={handleSort}
+          handleOpenEmployeeDrawer={handleOpenEmployeeDrawer}
+          handleOpenModal={handleOpenModal}
+          formatDate={formatDate}
+          getRelativeTime={getRelativeTime}
+          getEmployeeName={getEmployeeName}
+          getTypeBadge={getTypeBadge}
+          getStatusBadge={getStatusBadge}
+          getPriorityBadge={getPriorityBadge}
+        />
+      )}
+
+      {/* Desktop Grid View */}
+      {viewMode === 'grid' && (
+        <div className="hidden md:grid grid-cols-2 xl:grid-cols-3 gap-4 items-start">
+          {filteredSuggestions.map(suggestion => {
+            const employee = employees.find(
+              emp => emp.id === suggestion.employeeId
+            );
+            if (!employee) return null;
+
+            return (
+              <div key={suggestion.id}>
+                <SuggestionCard
+                  suggestion={suggestion}
+                  employeeName={employee.name}
+                  admin={admin}
+                  onUpdate={handleOpenModal}
+                  showExpandButton={true}
+                  onEmployeeClick={employeeId => {
+                    const emp = employees.find(e => e.id === employeeId);
+                    if (emp) handleOpenEmployeeDrawer(emp);
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
@@ -463,20 +529,81 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
             <SuggestionCard
               key={suggestion.id}
               suggestion={suggestion}
-              employee={employee}
+              employeeName={employee.name}
               admin={admin}
               onUpdate={handleOpenModal}
+              showExpandButton={true}
+              onEmployeeClick={employeeId => {
+                const emp = employees.find(e => e.id === employeeId);
+                if (emp) handleOpenEmployeeDrawer(emp);
+              }}
             />
           );
         })}
       </div>
 
       {filteredSuggestions.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">
-            No suggestions found matching your filters.
-          </p>
-        </div>
+        <EmptyState
+          title={
+            suggestions.length === 0
+              ? 'No suggestions yet'
+              : 'No matching suggestions'
+          }
+          description={
+            suggestions.length === 0
+              ? 'Get started by creating your first suggestion or seeding sample data.'
+              : 'Try adjusting your filters to see more suggestions.'
+          }
+          icon={
+            <svg
+              className="w-12 h-12"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          }
+          action={
+            suggestions.length === 0 ? (
+              <div className="space-x-3">
+                <PermissionGuard permission="create_suggestions" admin={admin}>
+                  <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    Create First Suggestion
+                  </button>
+                </PermissionGuard>
+              </div>
+            ) : (
+              <button
+                onClick={() => setFilters({})}
+                className="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                Clear Filters
+              </button>
+            )
+          }
+        />
       )}
 
       {/* Status Update Modal */}

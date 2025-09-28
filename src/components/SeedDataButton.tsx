@@ -43,13 +43,6 @@ export default function SeedDataButton() {
 
   return (
     <div className="p-4 border rounded-lg">
-      <h3 className="text-lg font-semibold mb-2">Firestore Data Seeding</h3>
-      <p className="text-sm text-gray-600 mb-4">
-        Click the button below to seed Firestore with sample employees and
-        suggestions. Make sure your Firebase configuration is set up in
-        .env.local
-      </p>
-
       <div className="space-x-2">
         <button
           onClick={handleSeedData}

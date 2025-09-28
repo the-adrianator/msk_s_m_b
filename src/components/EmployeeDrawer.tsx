@@ -35,6 +35,8 @@ export default function EmployeeDrawer({
       setSuggestions(employeeSuggestions);
     } catch (error) {
       console.error('Error loading employee suggestions:', error);
+      // Set empty array on error to show "No suggestions found" message
+      setSuggestions([]);
     } finally {
       setIsLoading(false);
     }
@@ -101,14 +103,14 @@ export default function EmployeeDrawer({
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-gray-600 bg-opacity-50 z-40"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
           onClick={onClose}
         />
       )}
 
       {/* Drawer */}
       <div
-        className={`fixed right-0 top-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 h-full w-full max-w-md bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-xl z-50 transform transition-transform duration-300 ease-in-out border-l border-white/20 dark:border-gray-700/50 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

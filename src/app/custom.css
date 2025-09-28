@@ -1,0 +1,134 @@
+/* Enhanced Frozen Table Styles */
+
+/* Base table container */
+.frozen-table-container {
+  position: relative;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  max-height: 600px;
+}
+
+.dark .frozen-table-container {
+  border-color: #374151;
+}
+
+/* Table styling */
+.frozen-table {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Frozen column base styles */
+.frozen-column {
+  position: sticky;
+  z-index: 30;
+  background-color: inherit;
+}
+
+/* First frozen column */
+.frozen-column-1 {
+  left: 0px;
+  z-index: 40;
+  border-right: 1px solid #d1d5db;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .frozen-column-1 {
+  border-right-color: #4b5563;
+}
+
+/* Second frozen column */
+.frozen-column-2 {
+  left: 128px; /* Width of first column */
+  z-index: 40;
+  border-right: 1px solid #d1d5db;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .frozen-column-2 {
+  border-right-color: #4b5563;
+}
+
+/* Header specific styles */
+.frozen-table thead th.frozen-column {
+  z-index: 50;
+  position: sticky;
+  top: 0;
+}
+
+/* Row hover effects that work with frozen columns */
+.frozen-table tbody tr:hover .frozen-column {
+  background-color: #f9fafb;
+}
+
+.dark .frozen-table tbody tr:hover .frozen-column {
+  background-color: #1f2937;
+}
+
+/* Alternating row colors for frozen columns */
+.frozen-table tbody tr:nth-child(even) .frozen-column {
+  background-color: #f9fafb;
+}
+
+.frozen-table tbody tr:nth-child(odd) .frozen-column {
+  background-color: #ffffff;
+}
+
+.dark .frozen-table tbody tr:nth-child(even) .frozen-column {
+  background-color: #1f2937;
+}
+
+.dark .frozen-table tbody tr:nth-child(odd) .frozen-column {
+  background-color: #111827;
+}
+
+/* Smooth transitions */
+.frozen-column {
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Scrollbar styling */
+.frozen-table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.frozen-table-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.frozen-table-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.frozen-table-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark .frozen-table-container::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark .frozen-table-container::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark .frozen-table-container::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Focus states for accessibility */
+.frozen-column button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .frozen-table-container {
+    display: none;
+  }
+}

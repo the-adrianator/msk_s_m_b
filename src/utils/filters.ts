@@ -4,11 +4,13 @@ import { Suggestion, SuggestionFilters } from '@/types';
  * Filter suggestions based on provided filters
  * @param suggestions - Array of suggestions to filter
  * @param filters - Filter criteria
+ * @param employees - Array of employees for name lookup
  * @returns Filtered array of suggestions
  */
 export function filterSuggestions(
   suggestions: Suggestion[],
-  filters: SuggestionFilters
+  filters: SuggestionFilters,
+  employees?: Array<{ id: string; name: string }>
 ): Suggestion[] {
   return suggestions.filter(suggestion => {
     // Employee filter
@@ -36,10 +38,25 @@ export function filterSuggestions(
       return false;
     }
 
-    // Free-text search over description
+    // Free-text search across multiple fields
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      if (!suggestion.description.toLowerCase().includes(searchTerm)) {
+      const employee = employees?.find(emp => emp.id === suggestion.employeeId);
+      const employeeName = employee?.name || '';
+      
+      const searchableFields = [
+        suggestion.description,
+        suggestion.type,
+        suggestion.status,
+        suggestion.priority,
+        suggestion.source,
+        employeeName,
+        suggestion.notes || '',
+        suggestion.estimatedCost || ''
+      ];
+      
+      const searchableText = searchableFields.join(' ').toLowerCase();
+      if (!searchableText.includes(searchTerm)) {
         return false;
       }
     }

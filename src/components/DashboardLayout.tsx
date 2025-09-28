@@ -1,129 +1,62 @@
 'use client';
 
+import { useState } from 'react';
 import { AdminUser } from '@/types';
 import Header from './Header';
-import PermissionGuard from './PermissionGuard';
+import Sidebar from './Sidebar';
+import { usePathname } from 'next/navigation';
 
 interface DashboardLayoutProps {
   admin: AdminUser;
-  onLogout: () => void;
   children: React.ReactNode;
 }
 
 export default function DashboardLayout({
   admin,
-  onLogout,
   children,
 }: DashboardLayoutProps) {
+  const pathname = usePathname();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header admin={admin} onLogout={onLogout} />
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Mobile Sidebar Overlay */}
+      {isMobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={closeMobileSidebar}
+        />
+      )}
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Welcome message with role-based content */}
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Welcome back, {admin.name}
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              {admin.role} • {admin.email}
-            </p>
-          </div>
+      {/* Desktop Sidebar - Hidden on mobile, visible on desktop */}
+      <aside className="hidden lg:block fixed left-0 top-0 h-full w-64 z-30">
+        <Sidebar currentPath={pathname} />
+      </aside>
 
-          {/* Permission-based content sections */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {/* Create Suggestions Card */}
-            <PermissionGuard
-              permission="create_suggestions"
-              admin={admin}
-              fallback={
-                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
-                    Create Suggestions
-                  </h3>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
-                    You don&apos;t have permission to create suggestions
-                  </p>
-                </div>
-              }
-            >
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Create Suggestions
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Create new MSK risk reduction suggestions for employees
-                </p>
-                <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  Create New Suggestion
-                </button>
-              </div>
-            </PermissionGuard>
+      {/* Mobile Sidebar - Slides in from left */}
+      <aside
+        className={`fixed left-0 top-0 h-full w-64 z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
+          isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <Sidebar currentPath={pathname} onClose={closeMobileSidebar} />
+      </aside>
 
-            {/* Update Status Card */}
-            <PermissionGuard
-              permission="update_status"
-              admin={admin}
-              fallback={
-                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
-                    Update Status
-                  </h3>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
-                    You don&apos;t have permission to update suggestion status
-                  </p>
-                </div>
-              }
-            >
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Update Status
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Update the status of existing suggestions
-                </p>
-                <button className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                  Manage Suggestions
-                </button>
-              </div>
-            </PermissionGuard>
-
-            {/* View All Card */}
-            <PermissionGuard
-              permission="view_all"
-              admin={admin}
-              fallback={
-                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
-                    View Data
-                  </h3>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
-                    You don&apos;t have permission to view all data
-                  </p>
-                </div>
-              }
-            >
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  View All Data
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Access all suggestions and employee data
-                </p>
-                <button className="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                  View Dashboard
-                </button>
-              </div>
-            </PermissionGuard>
-          </div>
-
-          {/* Main content area */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            {children}
-          </div>
-        </div>
-      </main>
+      {/* Main content area with responsive margin */}
+      <div className="flex flex-col flex-grow lg:ml-64 overflow-x-hidden">
+        <Header admin={admin} onToggleMobileSidebar={toggleMobileSidebar} />
+        <main className="flex-grow py-4 sm:py-6 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+          <div className="w-full overflow-x-hidden">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }

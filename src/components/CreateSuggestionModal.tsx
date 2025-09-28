@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { Employee, CreateSuggestionData } from '@/types';
 import { getEmployees } from '@/services/employeeService';
 import { createSuggestion } from '@/services/suggestionService';
-import { AdminUser } from '@/types';
+import { AdminUser, Suggestion } from '@/types';
 
 interface CreateSuggestionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (suggestion: any) => void;
+  onSuccess: (suggestion: Suggestion) => void;
   admin: AdminUser;
 }
 
@@ -23,7 +23,7 @@ export default function CreateSuggestionModal({
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Form state
   const [formData, setFormData] = useState<CreateSuggestionData>({
     employeeId: '',
@@ -67,11 +67,12 @@ export default function CreateSuggestionModal({
       }
 
       const suggestionId = await createSuggestion(formData, admin.email);
-      
+
       // Create the new suggestion object for optimistic update
       const newSuggestion = {
         id: suggestionId,
         ...formData,
+        priority: formData.priority || 'medium', // Ensure priority is never undefined
         status: 'pending' as const,
         source: 'admin' as const,
         createdBy: admin.email,
@@ -81,7 +82,7 @@ export default function CreateSuggestionModal({
 
       onSuccess(newSuggestion);
       onClose();
-      
+
       // Reset form
       setFormData({
         employeeId: '',
@@ -99,20 +100,23 @@ export default function CreateSuggestionModal({
     }
   };
 
-  const handleInputChange = (field: keyof CreateSuggestionData, value: string) => {
+  const handleInputChange = (
+    field: keyof CreateSuggestionData,
+    value: string
+  ) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white dark:bg-gray-800">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border w-full max-w-md shadow-2xl rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-white/20 dark:border-gray-700/50">
         <div className="mt-3">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
             Create New Suggestion
           </h3>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Employee Selection - Required */}
             <div>
@@ -126,7 +130,9 @@ export default function CreateSuggestionModal({
               ) : (
                 <select
                   value={formData.employeeId}
-                  onChange={(e) => handleInputChange('employeeId', e.target.value)}
+                  onChange={e =>
+                    handleInputChange('employeeId', e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                   required
                 >
@@ -147,7 +153,7 @@ export default function CreateSuggestionModal({
               </label>
               <select
                 value={formData.type}
-                onChange={(e) => handleInputChange('type', e.target.value)}
+                onChange={e => handleInputChange('type', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 required
               >
@@ -165,7 +171,7 @@ export default function CreateSuggestionModal({
               </label>
               <textarea
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={e => handleInputChange('description', e.target.value)}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 placeholder="Describe the MSK risk reduction suggestion..."
@@ -180,7 +186,7 @@ export default function CreateSuggestionModal({
               </label>
               <select
                 value={formData.priority}
-                onChange={(e) => handleInputChange('priority', e.target.value)}
+                onChange={e => handleInputChange('priority', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value="low">Low</option>
@@ -196,7 +202,7 @@ export default function CreateSuggestionModal({
               </label>
               <textarea
                 value={formData.notes}
-                onChange={(e) => handleInputChange('notes', e.target.value)}
+                onChange={e => handleInputChange('notes', e.target.value)}
                 rows={2}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 placeholder="Additional notes or context..."
@@ -211,14 +217,18 @@ export default function CreateSuggestionModal({
               <input
                 type="text"
                 value={formData.estimatedCost}
-                onChange={(e) => handleInputChange('estimatedCost', e.target.value)}
+                onChange={e =>
+                  handleInputChange('estimatedCost', e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 placeholder="e.g., £85.00"
               />
             </div>
 
             {error && (
-              <div className="text-red-600 dark:text-red-400 text-sm">{error}</div>
+              <div className="text-red-600 dark:text-red-400 text-sm">
+                {error}
+              </div>
             )}
 
             {/* Action Buttons */}
@@ -231,7 +241,7 @@ export default function CreateSuggestionModal({
               >
                 Cancel
               </button>
-              
+
               <button
                 type="submit"
                 disabled={isSubmitting || isLoading}

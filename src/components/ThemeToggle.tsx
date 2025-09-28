@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Theme } from '@/types';
 import { initializeTheme, applyTheme, storeTheme } from '@/utils/theme';
+import { animationClasses } from '@/utils/animations';
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>('light');
@@ -41,7 +42,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
+      className={`p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 ${animationClasses.focusRing} ${animationClasses.hoverScale} transition-colors duration-200`}
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       {theme === 'light' ? (

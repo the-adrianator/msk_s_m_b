@@ -96,12 +96,11 @@ export async function getSuggestionsByEmployee(
     const suggestionsRef = collection(db, COLLECTION_NAME);
     const q = query(
       suggestionsRef,
-      where('employeeId', '==', employeeId),
-      orderBy('dateUpdated', 'desc')
+      where('employeeId', '==', employeeId)
     );
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.docs.map(doc => ({
+    const suggestions = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       // Convert Firestore timestamps to ISO strings
@@ -115,6 +114,11 @@ export async function getSuggestionsByEmployee(
         doc.data().dateCompleted?.toDate?.()?.toISOString() ||
         doc.data().dateCompleted,
     })) as Suggestion[];
+
+    // Sort by dateUpdated in descending order (most recent first)
+    return suggestions.sort((a, b) => 
+      new Date(b.dateUpdated).getTime() - new Date(a.dateUpdated).getTime()
+    );
   } catch (error) {
     console.error('Error fetching suggestions by employee:', error);
     throw new Error('Failed to fetch suggestions by employee');
