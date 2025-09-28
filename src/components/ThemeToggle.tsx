@@ -1,32 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Theme } from '@/types';
-import { initializeTheme, applyTheme, storeTheme } from '@/utils/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { animationClasses } from '@/utils/animations';
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>('light');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    // Initialize theme on mount
-    const initialTheme = initializeTheme();
-    setTheme(initialTheme);
-    setMounted(true);
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    applyTheme(newTheme);
-    storeTheme(newTheme);
-  };
+  const { theme, toggleTheme, mounted } = useTheme();
 
   // Prevent hydration mismatch by not rendering until mounted
   if (!mounted) {
     return (
-      <button className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+      <button className="p-2 rounded-md text-gray-500 hover:text-gray-700 cursor-pointer">
         <svg
           className="w-5 h-5"
           fill="none"
@@ -42,7 +25,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className={`p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 ${animationClasses.focusRing} ${animationClasses.hoverScale} transition-colors duration-200`}
+      className={`p-2 rounded-md ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} ${animationClasses.focusRing} ${animationClasses.hoverScale} transition-colors duration-200 cursor-pointer`}
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       {theme === 'light' ? (

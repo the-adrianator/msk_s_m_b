@@ -14,7 +14,7 @@ interface PermissionGuardProps {
 export default function PermissionGuard({
   children,
   permission,
-  admin: _admin,
+  admin,
   fallback = null,
 }: PermissionGuardProps) {
   const hasRequiredPermission = hasPermission(permission);

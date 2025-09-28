@@ -1,24 +1,37 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Employee, Suggestion } from '@/types';
+import { Employee, Suggestion, AdminUser } from '@/types';
 import { getSuggestionsByEmployee } from '@/services/suggestionService';
 import { formatDate } from '@/utils/dates';
 import { formatCurrency } from '@/utils/currency';
+import { useTheme } from '@/contexts/ThemeContext';
+import {
+  getThemeCardClasses,
+  getThemeTextClasses,
+  getThemeBorderClasses,
+} from '@/utils/themeClasses';
+import StatusUpdateModal from './StatusUpdateModal';
 
 interface EmployeeDrawerProps {
   employee: Employee | null;
   isOpen: boolean;
   onClose: () => void;
+  admin: AdminUser;
 }
 
 export default function EmployeeDrawer({
   employee,
   isOpen,
   onClose,
+  admin,
 }: EmployeeDrawerProps) {
+  const { theme } = useTheme();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedSuggestion, setSelectedSuggestion] =
+    useState<Suggestion | null>(null);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
   const loadEmployeeSuggestions = useCallback(async () => {
     if (!employee) return;
@@ -42,28 +55,55 @@ export default function EmployeeDrawer({
     }
   }, [employee, isOpen, loadEmployeeSuggestions]);
 
+  const handleUpdateSuggestion = (suggestion: Suggestion) => {
+    setSelectedSuggestion(suggestion);
+    setIsUpdateModalOpen(true);
+  };
+
+  const handleUpdateFromModal = (updatedSuggestion: Suggestion) => {
+    setSuggestions(prev =>
+      prev.map(s => (s.id === updatedSuggestion.id ? updatedSuggestion : s))
+    );
+    setIsUpdateModalOpen(false);
+    setSelectedSuggestion(null);
+  };
+
+  const handleCloseUpdateModal = () => {
+    setIsUpdateModalOpen(false);
+    setSelectedSuggestion(null);
+  };
+
   const getRiskLevelColor = (riskLevel: string) => {
     switch (riskLevel) {
       case 'high':
-        return 'text-red-600 dark:text-red-400';
+        return theme === 'dark' ? 'text-red-400' : 'text-red-600';
       case 'medium':
-        return 'text-yellow-600 dark:text-yellow-400';
+        return theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600';
       case 'low':
-        return 'text-green-600 dark:text-green-400';
+        return theme === 'dark' ? 'text-green-400' : 'text-green-600';
       default:
-        return 'text-gray-600 dark:text-gray-400';
+        return theme === 'dark' ? 'text-gray-400' : 'text-gray-600';
     }
   };
 
   const getStatusBadge = (status: string) => {
     const statusClass = {
       pending:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+        theme === 'dark'
+          ? 'bg-yellow-900/20 text-yellow-300'
+          : 'bg-yellow-100 text-yellow-800',
       in_progress:
-        'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+        theme === 'dark'
+          ? 'bg-blue-900/20 text-blue-300'
+          : 'bg-blue-100 text-blue-800',
       completed:
-        'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-      dismissed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+        theme === 'dark'
+          ? 'bg-green-900/20 text-green-300'
+          : 'bg-green-100 text-green-800',
+      dismissed:
+        theme === 'dark'
+          ? 'bg-red-900/20 text-red-300'
+          : 'bg-red-100 text-red-800',
     };
 
     return (
@@ -78,13 +118,21 @@ export default function EmployeeDrawer({
   const getTypeBadge = (type: string) => {
     const typeClass = {
       exercise:
-        'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
+        theme === 'dark'
+          ? 'bg-green-900/20 text-green-300'
+          : 'bg-green-100 text-green-800',
       equipment:
-        'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+        theme === 'dark'
+          ? 'bg-blue-900/20 text-blue-300'
+          : 'bg-blue-100 text-blue-800',
       behavioural:
-        'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300',
+        theme === 'dark'
+          ? 'bg-purple-900/20 text-purple-300'
+          : 'bg-purple-100 text-purple-800',
       lifestyle:
-        'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300',
+        theme === 'dark'
+          ? 'bg-orange-900/20 text-orange-300'
+          : 'bg-orange-100 text-orange-800',
     };
 
     return (
@@ -103,29 +151,33 @@ export default function EmployeeDrawer({
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 cursor-pointer"
           onClick={onClose}
         />
       )}
 
       {/* Drawer */}
       <div
-        className={`fixed right-0 top-0 h-full w-full max-w-md bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-xl z-50 transform transition-transform duration-300 ease-in-out border-l border-white/20 dark:border-gray-700/50 ${
+        className={`fixed right-0 top-0 h-full w-full max-w-md ${theme === 'dark' ? 'bg-gray-800/90' : 'bg-white/90'} backdrop-blur-md shadow-xl z-50 transform transition-transform duration-300 ease-in-out border-l ${theme === 'dark' ? 'border-gray-700/50' : 'border-white/20'} ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <div
+            className={`flex items-center justify-between p-4 border-b ${getThemeBorderClasses(theme)}`}
+          >
+            <h2
+              className={`text-lg font-semibold ${getThemeTextClasses(theme)}`}
+            >
               Employee Details
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+              className={`p-2 ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} rounded-md cursor-pointer`}
             >
               <svg
-                className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                className={`w-5 h-5 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -154,10 +206,14 @@ export default function EmployeeDrawer({
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  <h3
+                    className={`text-lg font-medium ${getThemeTextClasses(theme)}`}
+                  >
                     {employee.name}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p
+                    className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+                  >
                     {employee.jobTitle}
                   </p>
                 </div>
@@ -165,25 +221,31 @@ export default function EmployeeDrawer({
 
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <span
+                    className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+                  >
                     Department:
                   </span>
-                  <span className="text-sm text-gray-900 dark:text-white">
+                  <span className={`text-sm ${getThemeTextClasses(theme)}`}>
                     {employee.department}
                   </span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <span
+                    className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+                  >
                     Workstation:
                   </span>
-                  <span className="text-sm text-gray-900 dark:text-white">
+                  <span className={`text-sm ${getThemeTextClasses(theme)}`}>
                     {employee.workstation}
                   </span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <span
+                    className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+                  >
                     Risk Level:
                   </span>
                   <span
@@ -194,10 +256,12 @@ export default function EmployeeDrawer({
                 </div>
 
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <span
+                    className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+                  >
                     Last Assessment:
                   </span>
-                  <span className="text-sm text-gray-900 dark:text-white">
+                  <span className={`text-sm ${getThemeTextClasses(theme)}`}>
                     {formatDate(employee.lastAssessment)}
                   </span>
                 </div>
@@ -206,7 +270,9 @@ export default function EmployeeDrawer({
 
             {/* Suggestions */}
             <div>
-              <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">
+              <h4
+                className={`text-md font-medium ${getThemeTextClasses(theme)} mb-3`}
+              >
                 Suggestions ({suggestions.length})
               </h4>
 
@@ -215,7 +281,9 @@ export default function EmployeeDrawer({
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
               ) : suggestions.length === 0 ? (
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                <p
+                  className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} text-center py-4`}
+                >
                   No suggestions found for this employee.
                 </p>
               ) : (
@@ -223,11 +291,13 @@ export default function EmployeeDrawer({
                   {suggestions.map(suggestion => (
                     <div
                       key={suggestion.id}
-                      className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3"
+                      className={`${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg p-3`}
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
-                          <p className="text-sm text-gray-900 dark:text-white font-medium">
+                          <p
+                            className={`text-sm ${getThemeTextClasses(theme)} font-medium`}
+                          >
                             {suggestion.description}
                           </p>
                         </div>
@@ -238,15 +308,21 @@ export default function EmployeeDrawer({
 
                       <div className="flex flex-wrap gap-2 mb-2">
                         {getTypeBadge(suggestion.type)}
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${theme === 'dark' ? 'bg-gray-600 text-gray-200' : 'bg-gray-200 text-gray-800'}`}
+                        >
                           {suggestion.priority}
                         </span>
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${theme === 'dark' ? 'bg-gray-600 text-gray-200' : 'bg-gray-200 text-gray-800'}`}
+                        >
                           {suggestion.source}
                         </span>
                       </div>
 
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                      <div
+                        className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+                      >
                         <div className="flex justify-between">
                           <span>Updated:</span>
                           <span>{formatDate(suggestion.dateUpdated)}</span>
@@ -260,6 +336,19 @@ export default function EmployeeDrawer({
                           </div>
                         )}
                       </div>
+
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                        <button
+                          onClick={() => handleUpdateSuggestion(suggestion)}
+                          className={`w-full px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer ${
+                            theme === 'dark'
+                              ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                              : 'bg-blue-600 hover:bg-blue-700 text-white'
+                          }`}
+                        >
+                          Update Status
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -268,6 +357,16 @@ export default function EmployeeDrawer({
           </div>
         </div>
       </div>
+
+      {/* Status Update Modal */}
+      {selectedSuggestion && (
+        <StatusUpdateModal
+          suggestion={selectedSuggestion}
+          isOpen={isUpdateModalOpen}
+          onClose={handleCloseUpdateModal}
+          onUpdate={handleUpdateFromModal}
+        />
+      )}
     </>
   );
 }

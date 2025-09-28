@@ -4,6 +4,12 @@ import { AdminUser } from '@/types';
 import { signOut } from '@/services/authService';
 import ThemeToggle from './ThemeToggle';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '@/contexts/ThemeContext';
+import {
+  getThemeCardClasses,
+  getThemeTextClasses,
+  getThemeBorderClasses,
+} from '@/utils/themeClasses';
 
 interface HeaderProps {
   admin: AdminUser;
@@ -12,6 +18,7 @@ interface HeaderProps {
 
 export default function Header({ admin, onToggleMobileSidebar }: HeaderProps) {
   const router = useRouter();
+  const { theme } = useTheme();
 
   const handleLogout = () => {
     signOut();
@@ -19,7 +26,9 @@ export default function Header({ admin, onToggleMobileSidebar }: HeaderProps) {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+    <header
+      className={`${getThemeCardClasses(theme)} shadow-sm border-b ${getThemeBorderClasses(theme)}`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Mobile menu button and title */}
@@ -27,7 +36,7 @@ export default function Header({ admin, onToggleMobileSidebar }: HeaderProps) {
             {/* Mobile menu button */}
             <button
               onClick={onToggleMobileSidebar}
-              className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 mr-3"
+              className={`lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 mr-3 cursor-pointer`}
               aria-label="Open sidebar"
             >
               <svg
@@ -44,7 +53,9 @@ export default function Header({ admin, onToggleMobileSidebar }: HeaderProps) {
                 />
               </svg>
             </button>
-            <h1 className="text-sm sm:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white">
+            <h1
+              className={`text-sm sm:text-lg lg:text-xl font-semibold ${getThemeTextClasses(theme)}`}
+            >
               MSK Suggestion Management Board
             </h1>
           </div>
@@ -54,10 +65,14 @@ export default function Header({ admin, onToggleMobileSidebar }: HeaderProps) {
             {/* User info - Hidden on very small screens */}
             <div className="hidden sm:flex items-center space-x-3">
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                <p
+                  className={`text-sm font-medium ${getThemeTextClasses(theme)}`}
+                >
                   {admin.name}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p
+                  className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+                >
                   {admin.role}
                 </p>
               </div>
@@ -77,7 +92,7 @@ export default function Header({ admin, onToggleMobileSidebar }: HeaderProps) {
             {/* Logout button */}
             <button
               onClick={handleLogout}
-              className="inline-flex items-center px-2 sm:px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className={`inline-flex items-center px-2 sm:px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md ${theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer`}
             >
               <svg
                 className="w-4 h-4 sm:mr-2"

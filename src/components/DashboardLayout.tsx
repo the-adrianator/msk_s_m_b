@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { AdminUser } from '@/types';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import { useTheme } from '@/contexts/ThemeContext';
 import { usePathname } from 'next/navigation';
+import { getThemeBgClasses } from '@/utils/themeClasses';
 
 interface DashboardLayoutProps {
   admin: AdminUser;
@@ -17,6 +19,7 @@ export default function DashboardLayout({
 }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const { theme } = useTheme();
 
   const toggleMobileSidebar = () => {
     setIsMobileSidebarOpen(!isMobileSidebarOpen);
@@ -27,7 +30,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className={`flex min-h-screen ${getThemeBgClasses(theme)}`}>
       {/* Mobile Sidebar Overlay */}
       {isMobileSidebarOpen && (
         <div

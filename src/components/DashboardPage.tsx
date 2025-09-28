@@ -11,12 +11,19 @@ import Toast from './Toast';
 import SuggestionCard from './SuggestionCard';
 import { useRouter } from 'next/navigation';
 import { PlusIcon, ListBulletIcon } from '@heroicons/react/24/solid';
+import { useTheme } from '@/contexts/ThemeContext';
+import {
+  getThemeCardClasses,
+  getThemeTextClasses,
+  getThemeBorderClasses,
+} from '@/utils/themeClasses';
 
 interface DashboardPageProps {
   admin: AdminUser;
 }
 
 export default function DashboardPage({ admin }: DashboardPageProps) {
+  const { theme } = useTheme();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedSuggestion, setSelectedSuggestion] =
@@ -166,12 +173,16 @@ export default function DashboardPage({ admin }: DashboardPageProps) {
     className?: string;
   }) => (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5 ${className}`}
+      className={`${getThemeCardClasses(theme)} rounded-lg shadow-sm border ${getThemeBorderClasses(theme)} p-5 ${className}`}
     >
-      <p className="text-sm font-bold text-gray-900 dark:text-white text-center sm:text-left">
+      <p
+        className={`text-sm font-bold ${getThemeTextClasses(theme)} text-center sm:text-left`}
+      >
         {title}
       </p>
-      <p className="mt-1 text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">
+      <p
+        className={`mt-1 text-3xl font-bold ${getThemeTextClasses(theme)} text-center sm:text-left`}
+      >
         {value}
       </p>
     </div>
@@ -182,10 +193,14 @@ export default function DashboardPage({ admin }: DashboardPageProps) {
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 space-y-4 lg:space-y-0">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+          <h1
+            className={`text-2xl sm:text-3xl font-bold ${getThemeTextClasses(theme)}`}
+          >
             Dashboard
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
+          <p
+            className={`text-sm sm:text-base ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mt-1`}
+          >
             Manage MSK health suggestions for your employees
           </p>
         </div>
@@ -193,7 +208,7 @@ export default function DashboardPage({ admin }: DashboardPageProps) {
           <PermissionGuard permission="create_suggestions" admin={admin}>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+              className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto cursor-pointer"
             >
               <PlusIcon className="w-4 h-4 mr-2" />
               Create Suggestion
@@ -201,7 +216,7 @@ export default function DashboardPage({ admin }: DashboardPageProps) {
           </PermissionGuard>
           <button
             onClick={() => router.push('/suggestions')}
-            className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full sm:w-auto"
+            className={`inline-flex items-center justify-center px-4 py-2 border ${getThemeBorderClasses(theme)} rounded-md shadow-sm text-sm font-medium ${theme === 'dark' ? 'text-gray-300 bg-gray-700 hover:bg-gray-600' : 'text-gray-700 bg-white hover:bg-gray-50'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full sm:w-auto cursor-pointer`}
           >
             <ListBulletIcon className="w-4 h-4 mr-2" />
             View All Suggestions
@@ -232,13 +247,13 @@ export default function DashboardPage({ admin }: DashboardPageProps) {
       {/* Recent Suggestions Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h2 className={`text-2xl font-bold ${getThemeTextClasses(theme)}`}>
             Recent Suggestions
           </h2>
           {recentSuggestions.length > 3 && (
             <button
               onClick={() => setShowAllRecent(!showAllRecent)}
-              className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+              className={`inline-flex items-center px-3 py-2 text-sm font-medium ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'} focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md cursor-pointer`}
             >
               {showAllRecent ? (
                 <>
@@ -294,7 +309,9 @@ export default function DashboardPage({ admin }: DashboardPageProps) {
             ))}
           {recentSuggestions.length === 0 && (
             <div className="lg:col-span-3">
-              <p className="text-center text-gray-500 dark:text-gray-400">
+              <p
+                className={`text-center ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+              >
                 No recent suggestions found.
               </p>
             </div>

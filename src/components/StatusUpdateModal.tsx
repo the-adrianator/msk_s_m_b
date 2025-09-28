@@ -3,6 +3,12 @@
 import { useState } from 'react';
 import { Suggestion, UpdateSuggestionData } from '@/types';
 import { updateSuggestion } from '@/services/suggestionService';
+import { useTheme } from '@/contexts/ThemeContext';
+import {
+  getThemeCardClasses,
+  getThemeTextClasses,
+  getThemeBorderClasses,
+} from '@/utils/themeClasses';
 
 interface StatusUpdateModalProps {
   suggestion: Suggestion;
@@ -17,6 +23,7 @@ export default function StatusUpdateModal({
   onClose,
   onUpdate,
 }: StatusUpdateModalProps) {
+  const { theme } = useTheme();
   const [status, setStatus] = useState(suggestion.status);
   const [notes, setNotes] = useState(suggestion.notes || '');
   const [estimatedCost, setEstimatedCost] = useState(
@@ -93,16 +100,22 @@ export default function StatusUpdateModal({
 
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-2xl rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-white/20 dark:border-gray-700/50">
+      <div
+        className={`relative top-20 mx-auto p-5 border w-96 shadow-2xl rounded-lg ${theme === 'dark' ? 'bg-gray-800/90' : 'bg-white/90'} backdrop-blur-md ${theme === 'dark' ? 'border-gray-700/50' : 'border-white/20'}`}
+      >
         <div className="mt-3">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+          <h3
+            className={`text-lg font-medium ${getThemeTextClasses(theme)} mb-4`}
+          >
             Update Suggestion Status
           </h3>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Status Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-2`}
+              >
                 Status
               </label>
               <select
@@ -116,7 +129,7 @@ export default function StatusUpdateModal({
                       | 'dismissed'
                   )
                 }
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className={`w-full px-3 py-2 border ${getThemeBorderClasses(theme)} rounded-md focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
                 required
               >
                 <option value="pending">Pending</option>
@@ -128,34 +141,40 @@ export default function StatusUpdateModal({
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-2`}
+              >
                 Notes
               </label>
               <textarea
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className={`w-full px-3 py-2 border ${getThemeBorderClasses(theme)} rounded-md focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
                 placeholder="Add any additional notes..."
               />
             </div>
 
             {/* Estimated Cost */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                className={`block text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} mb-2`}
+              >
                 Estimated Cost
               </label>
               <input
                 type="text"
                 value={estimatedCost}
                 onChange={e => setEstimatedCost(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className={`w-full px-3 py-2 border ${getThemeBorderClasses(theme)} rounded-md focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
                 placeholder="e.g., £85.00"
               />
             </div>
 
             {error && (
-              <div className="text-red-600 dark:text-red-400 text-sm">
+              <div
+                className={`${theme === 'dark' ? 'text-red-400' : 'text-red-600'} text-sm`}
+              >
                 {error}
               </div>
             )}
@@ -165,7 +184,7 @@ export default function StatusUpdateModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600"
+                className={`px-4 py-2 text-sm font-medium ${theme === 'dark' ? 'text-gray-300 bg-gray-700 hover:bg-gray-600' : 'text-gray-700 bg-gray-100 hover:bg-gray-200'} rounded-md cursor-pointer`}
                 disabled={isUpdating}
               >
                 Cancel
@@ -176,7 +195,7 @@ export default function StatusUpdateModal({
                   type="button"
                   onClick={handleDismiss}
                   disabled={isUpdating}
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 cursor-pointer"
                 >
                   {isUpdating ? 'Dismissing...' : 'Dismiss Suggestion'}
                 </button>
@@ -184,7 +203,7 @@ export default function StatusUpdateModal({
                 <button
                   type="submit"
                   disabled={isUpdating}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
                 >
                   {isUpdating ? 'Updating...' : 'Update Status'}
                 </button>

@@ -5,8 +5,9 @@ const config: Config = {
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/contexts/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  darkMode: 'class', // Use class strategy for dark mode as specified in PRD
+  darkMode: 'class', // Use class strategy for dark mode
   theme: {
     extend: {
       colors: {

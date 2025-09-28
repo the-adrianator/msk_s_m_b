@@ -22,12 +22,19 @@ import Toast from './Toast';
 import EmptyState from './EmptyState';
 import { TableSkeleton, CardSkeleton } from './LoadingSkeleton';
 import SuggestionTableData from './SuggestionTableData';
+import { useTheme } from '@/contexts/ThemeContext';
+import {
+  getThemeCardClasses,
+  getThemeTextClasses,
+  getThemeBorderClasses,
+} from '@/utils/themeClasses';
 
 interface SuggestionTableProps {
   admin: AdminUser;
 }
 
 export default function SuggestionTable({ admin }: SuggestionTableProps) {
+  const { theme } = useTheme();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>(
@@ -150,12 +157,21 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
     );
     const statusClass = {
       pending:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+        theme === 'dark'
+          ? 'bg-yellow-900/20 text-yellow-300'
+          : 'bg-yellow-100 text-yellow-800',
       in_progress:
-        'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+        theme === 'dark'
+          ? 'bg-blue-900/20 text-blue-300'
+          : 'bg-blue-100 text-blue-800',
       completed:
-        'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-      dismissed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+        theme === 'dark'
+          ? 'bg-green-900/20 text-green-300'
+          : 'bg-green-100 text-green-800',
+      dismissed:
+        theme === 'dark'
+          ? 'bg-red-900/20 text-red-300'
+          : 'bg-red-100 text-red-800',
     };
 
     return (
@@ -166,7 +182,9 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
           {suggestion.status.replace('_', ' ')}
         </span>
         {isOverdueSuggestion && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300">
+          <span
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${theme === 'dark' ? 'bg-red-900/20 text-red-300' : 'bg-red-100 text-red-800'}`}
+          >
             Overdue
           </span>
         )}
@@ -176,10 +194,18 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
 
   const getPriorityBadge = (priority: string) => {
     const priorityClass = {
-      low: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300',
+      low:
+        theme === 'dark'
+          ? 'bg-gray-900/20 text-gray-300'
+          : 'bg-gray-100 text-gray-800',
       medium:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
-      high: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+        theme === 'dark'
+          ? 'bg-yellow-900/20 text-yellow-300'
+          : 'bg-yellow-100 text-yellow-800',
+      high:
+        theme === 'dark'
+          ? 'bg-red-900/20 text-red-300'
+          : 'bg-red-100 text-red-800',
     };
 
     return (
@@ -194,13 +220,21 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
   const getTypeBadge = (type: string) => {
     const typeClass = {
       exercise:
-        'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
+        theme === 'dark'
+          ? 'bg-green-900/20 text-green-300'
+          : 'bg-green-100 text-green-800',
       equipment:
-        'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+        theme === 'dark'
+          ? 'bg-blue-900/20 text-blue-300'
+          : 'bg-blue-100 text-blue-800',
       behavioural:
-        'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300',
+        theme === 'dark'
+          ? 'bg-purple-900/20 text-purple-300'
+          : 'bg-purple-100 text-purple-800',
       lifestyle:
-        'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300',
+        theme === 'dark'
+          ? 'bg-orange-900/20 text-orange-300'
+          : 'bg-orange-100 text-orange-800',
     };
 
     return (
@@ -214,7 +248,9 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div
+        className={`${getThemeCardClasses(theme)} rounded-lg shadow-sm border ${getThemeBorderClasses(theme)} p-6`}
+      >
         <div className="hidden md:block">
           <TableSkeleton />
         </div>
@@ -227,7 +263,9 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
 
   if (error) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div
+        className={`${getThemeCardClasses(theme)} rounded-lg shadow-sm border ${getThemeBorderClasses(theme)} p-6`}
+      >
         <EmptyState
           title="Something went wrong"
           description={error}
@@ -250,7 +288,7 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
             <div className="space-x-3">
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
               >
                 <svg
                   className="w-4 h-4 mr-2"
@@ -291,7 +329,7 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
                   };
                   loadData();
                 }}
-                className="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 cursor-pointer"
               >
                 Try Again
               </button>
@@ -305,11 +343,15 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
   return (
     <div className="space-y-6 overflow-x-hidden">
       {/* Filters and Search */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+      <div
+        className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} rounded-lg p-4`}
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label
+              className={`block text-sm font-medium ${getThemeTextClasses(theme)} mb-1`}
+            >
               Search All
             </label>
             <input
@@ -317,13 +359,15 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
               placeholder="Search names, descriptions, status, priority..."
               value={filters.search || ''}
               onChange={e => handleFilterChange({ search: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              className={`w-full px-3 py-2 border ${getThemeBorderClasses(theme)} rounded-md focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
             />
           </div>
 
           {/* Employee Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label
+              className={`block text-sm font-medium ${getThemeTextClasses(theme)} mb-1`}
+            >
               Employee
             </label>
             <select
@@ -331,7 +375,7 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
               onChange={e =>
                 handleFilterChange({ employee: e.target.value || undefined })
               }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              className={`w-full px-3 py-2 border ${getThemeBorderClasses(theme)} rounded-md focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
             >
               <option value="">All Employees</option>
               {employees.map(employee => (
@@ -344,7 +388,9 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
 
           {/* Status Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label
+              className={`block text-sm font-medium ${getThemeTextClasses(theme)} mb-1`}
+            >
               Status
             </label>
             <select
@@ -352,7 +398,7 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
               onChange={e =>
                 handleFilterChange({ status: e.target.value || undefined })
               }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              className={`w-full px-3 py-2 border ${getThemeBorderClasses(theme)} rounded-md focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
             >
               <option value="">All Statuses</option>
               <option value="pending">Pending</option>
@@ -364,7 +410,9 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
 
           {/* Priority Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label
+              className={`block text-sm font-medium ${getThemeTextClasses(theme)} mb-1`}
+            >
               Priority
             </label>
             <select
@@ -372,7 +420,7 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
               onChange={e =>
                 handleFilterChange({ priority: e.target.value || undefined })
               }
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              className={`w-full px-3 py-2 border ${getThemeBorderClasses(theme)} rounded-md focus:ring-blue-500 focus:border-blue-500 ${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'}`}
             >
               <option value="">All Priorities</option>
               <option value="low">Low</option>
@@ -385,19 +433,27 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
 
       {/* Results Summary and Actions */}
       <div className="flex flex-col md:flex-row justify-between items-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 md:mb-0">
+        <p
+          className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mb-2 md:mb-0`}
+        >
           Showing {filteredSuggestions.length} of {suggestions.length}{' '}
           suggestions
         </p>
         <div className="flex items-center space-x-3">
           {/* View Toggle Button */}
-          <div className="hidden md:flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+          <div
+            className={`hidden md:flex items-center ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg p-1`}
+          >
             <button
               onClick={() => setViewMode('table')}
-              className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  ? theme === 'dark'
+                    ? 'bg-gray-600 text-white shadow-sm'
+                    : 'bg-white text-gray-900 shadow-sm'
+                  : theme === 'dark'
+                    ? 'text-gray-400 hover:text-gray-300'
+                    : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               <svg
@@ -417,10 +473,14 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
             </button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              className={`inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                 viewMode === 'grid'
-                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  ? theme === 'dark'
+                    ? 'bg-gray-600 text-white shadow-sm'
+                    : 'bg-white text-gray-900 shadow-sm'
+                  : theme === 'dark'
+                    ? 'text-gray-400 hover:text-gray-300'
+                    : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               <svg
@@ -443,7 +503,7 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
           <PermissionGuard permission="create_suggestions" admin={admin}>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center px-4 py-1.5 md:py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-1.5 md:py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -616,6 +676,7 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
         employee={selectedEmployee}
         isOpen={isDrawerOpen}
         onClose={handleCloseEmployeeDrawer}
+        admin={admin}
       />
 
       {/* Create Suggestion Modal */}

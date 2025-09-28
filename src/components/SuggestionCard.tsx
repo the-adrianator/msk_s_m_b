@@ -6,6 +6,12 @@ import { getRelativeTime, isOverdue } from '@/utils/dates';
 import { formatCurrency } from '@/utils/currency';
 import { AdminUser } from '@/types';
 import PermissionGuard from './PermissionGuard';
+import { useTheme } from '@/contexts/ThemeContext';
+import {
+  getThemeCardClasses,
+  getThemeTextClasses,
+  getThemeBorderClasses,
+} from '@/utils/themeClasses';
 
 interface SuggestionCardProps {
   suggestion: Suggestion;
@@ -26,6 +32,7 @@ export default function SuggestionCard({
   showExpandButton = false,
   onEmployeeClick,
 }: SuggestionCardProps) {
+  const { theme } = useTheme();
   const [isCardExpanded, setIsCardExpanded] = useState(isExpanded);
   const getStatusBadge = (suggestion: Suggestion) => {
     const isOverdueSuggestion = isOverdue(
@@ -34,12 +41,21 @@ export default function SuggestionCard({
     );
     const statusClass = {
       pending:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+        theme === 'dark'
+          ? 'bg-yellow-900/20 text-yellow-300'
+          : 'bg-yellow-100 text-yellow-800',
       in_progress:
-        'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+        theme === 'dark'
+          ? 'bg-blue-900/20 text-blue-300'
+          : 'bg-blue-100 text-blue-800',
       completed:
-        'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-      dismissed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+        theme === 'dark'
+          ? 'bg-green-900/20 text-green-300'
+          : 'bg-green-100 text-green-800',
+      dismissed:
+        theme === 'dark'
+          ? 'bg-red-900/20 text-red-300'
+          : 'bg-red-100 text-red-800',
     };
 
     return (
@@ -50,7 +66,9 @@ export default function SuggestionCard({
           {suggestion.status.replace('_', ' ')}
         </span>
         {isOverdueSuggestion && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300">
+          <span
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${theme === 'dark' ? 'bg-red-900/20 text-red-300' : 'bg-red-100 text-red-800'}`}
+          >
             Overdue
           </span>
         )}
@@ -60,10 +78,18 @@ export default function SuggestionCard({
 
   const getPriorityBadge = (priority: string) => {
     const priorityClass = {
-      low: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300',
+      low:
+        theme === 'dark'
+          ? 'bg-gray-900/20 text-gray-300'
+          : 'bg-gray-100 text-gray-800',
       medium:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
-      high: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+        theme === 'dark'
+          ? 'bg-yellow-900/20 text-yellow-300'
+          : 'bg-yellow-100 text-yellow-800',
+      high:
+        theme === 'dark'
+          ? 'bg-red-900/20 text-red-300'
+          : 'bg-red-100 text-red-800',
     };
 
     return (
@@ -78,13 +104,21 @@ export default function SuggestionCard({
   const getTypeBadge = (type: string) => {
     const typeClass = {
       exercise:
-        'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
+        theme === 'dark'
+          ? 'bg-green-900/20 text-green-300'
+          : 'bg-green-100 text-green-800',
       equipment:
-        'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+        theme === 'dark'
+          ? 'bg-blue-900/20 text-blue-300'
+          : 'bg-blue-100 text-blue-800',
       behavioural:
-        'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300',
+        theme === 'dark'
+          ? 'bg-purple-900/20 text-purple-300'
+          : 'bg-purple-100 text-purple-800',
       lifestyle:
-        'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300',
+        theme === 'dark'
+          ? 'bg-orange-900/20 text-orange-300'
+          : 'bg-orange-100 text-orange-800',
     };
 
     return (
@@ -97,24 +131,28 @@ export default function SuggestionCard({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow min-h-[160px]">
+    <div
+      className={`${getThemeCardClasses(theme)} rounded-lg shadow-sm border ${getThemeBorderClasses(theme)} p-4 hover:shadow-md transition-shadow min-h-[160px]`}
+    >
       {/* Header with employee info and status */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
           {onEmployeeClick ? (
             <button
               onClick={() => onEmployeeClick(suggestion.employeeId)}
-              className="font-medium text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 text-left transition-colors duration-200"
+              className={`font-medium ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'} text-left transition-colors duration-200 cursor-pointer`}
             >
               {employeeName}
             </button>
           ) : (
-            <h3 className="font-medium text-gray-900 dark:text-white">
+            <h3 className={`font-medium ${getThemeTextClasses(theme)}`}>
               {employeeName}
             </h3>
           )}
           {isCardExpanded && (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p
+              className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+            >
               Employee • Department
             </p>
           )}
@@ -124,7 +162,7 @@ export default function SuggestionCard({
           {showExpandButton && (
             <button
               onClick={() => setIsCardExpanded(!isCardExpanded)}
-              className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+              className={`p-1 text-gray-400 ${theme === 'dark' ? 'hover:text-gray-300' : 'hover:text-gray-600'} focus:outline-none focus:ring-2 focus:ring-blue-500 rounded cursor-pointer`}
               aria-label={isCardExpanded ? 'Collapse card' : 'Expand card'}
             >
               {isCardExpanded ? (
@@ -163,7 +201,9 @@ export default function SuggestionCard({
 
       {/* Description */}
       <div className="mb-3">
-        <p className="text-sm text-gray-700 dark:text-gray-300">
+        <p
+          className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
+        >
           {suggestion.description}
         </p>
       </div>
@@ -172,7 +212,9 @@ export default function SuggestionCard({
       <div className="flex flex-wrap gap-2 mb-3">
         {getTypeBadge(suggestion.type)}
         {getPriorityBadge(suggestion.priority)}
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300">
+        <span
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${theme === 'dark' ? 'bg-gray-900/20 text-gray-300' : 'bg-gray-100 text-gray-800'}`}
+        >
           {suggestion.source}
         </span>
       </div>
@@ -181,7 +223,9 @@ export default function SuggestionCard({
       {isCardExpanded && (
         <>
           {/* Additional info */}
-          <div className="space-y-2 text-xs text-gray-500 dark:text-gray-400">
+          <div
+            className={`space-y-2 text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}
+          >
             <div className="flex justify-between">
               <span>Last updated:</span>
               <span>{getRelativeTime(suggestion.dateUpdated)}</span>
@@ -195,7 +239,9 @@ export default function SuggestionCard({
             {suggestion.notes && (
               <div>
                 <span className="font-medium">Notes:</span>
-                <p className="mt-1 text-gray-600 dark:text-gray-300">
+                <p
+                  className={`mt-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
+                >
                   {suggestion.notes}
                 </p>
               </div>
@@ -203,11 +249,11 @@ export default function SuggestionCard({
           </div>
 
           {/* Actions */}
-          <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <div className={`mt-4 pt-3 border-t ${getThemeBorderClasses(theme)}`}>
             <PermissionGuard permission="update_status" admin={admin}>
               <button
                 onClick={() => onUpdate(suggestion)}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium"
+                className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium cursor-pointer"
               >
                 Update Status
               </button>

@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { Suggestion, Employee, AdminUser, SortField } from '@/types';
 import PermissionGuard from './PermissionGuard';
 import SuggestionDetailModal from './SuggestionDetailModal';
+import { useTheme } from '@/contexts/ThemeContext';
+import {
+  getThemeTextClasses,
+  getThemeBorderClasses,
+} from '@/utils/themeClasses';
 
 interface SuggestionTableDataProps {
   filteredSuggestions: Suggestion[];
@@ -36,6 +41,7 @@ const SuggestionTableData = ({
   getStatusBadge,
   getPriorityBadge,
 }: SuggestionTableDataProps) => {
+  const { theme } = useTheme();
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedSuggestion, setSelectedSuggestion] =
     useState<Suggestion | null>(null);
@@ -56,17 +62,21 @@ const SuggestionTableData = ({
 
   return (
     <div className="hidden md:block w-full">
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+      <div
+        className={`border ${getThemeBorderClasses(theme)} rounded-lg overflow-hidden`}
+      >
         <div className="overflow-x-auto" style={{ maxHeight: '600px' }}>
           <table
-            className="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
+            className={`min-w-full divide-y ${getThemeBorderClasses(theme)}`}
             style={{ minWidth: '1200px' }}
           >
-            <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0 z-30">
+            <thead
+              className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'} sticky top-0 z-30`}
+            >
               <tr>
                 {/* First column - Last Updated */}
                 <th
-                  className="pl-4 pr-[41px] py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 w-64 bg-gray-50 dark:bg-gray-800"
+                  className={`pl-4 pr-[41px] py-3 text-left text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider cursor-pointer ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} w-64 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}
                   onClick={() => handleSort('dateUpdated')}
                   style={{ position: 'sticky', left: '0px', zIndex: 20 }}
                 >
@@ -80,21 +90,25 @@ const SuggestionTableData = ({
 
                 {/* Second column - Employee */}
                 <th
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32 bg-gray-50 dark:bg-gray-800"
+                  className={`px-4 py-3 text-left text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider w-32 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}
                   style={{ position: 'sticky', left: '128px', zIndex: 20 }}
                 >
                   Employee
                 </th>
 
                 {/* Scrollable columns */}
-                <th className="pl-8 pr-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-64">
+                <th
+                  className={`pl-8 pr-4 py-3 text-left text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider w-64`}
+                >
                   Description
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
+                <th
+                  className={`px-4 py-3 text-left text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider w-24`}
+                >
                   Category
                 </th>
                 <th
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 w-24"
+                  className={`px-4 py-3 text-left text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider cursor-pointer ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} w-24`}
                   onClick={() => handleSort('status')}
                 >
                   <div className="flex items-center space-x-1">
@@ -104,11 +118,13 @@ const SuggestionTableData = ({
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-20">
+                <th
+                  className={`px-4 py-3 text-left text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider w-20`}
+                >
                   Source
                 </th>
                 <th
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 w-20"
+                  className={`px-4 py-3 text-left text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider cursor-pointer ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} w-20`}
                   onClick={() => handleSort('priority')}
                 >
                   <div className="flex items-center space-x-1">
@@ -118,32 +134,42 @@ const SuggestionTableData = ({
                     )}
                   </div>
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">
+                <th
+                  className={`px-4 py-3 text-left text-xs font-medium ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider w-24`}
+                >
                   Actions
                 </th>
               </tr>
             </thead>
 
-            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody
+              className={`${theme === 'dark' ? 'bg-gray-900' : 'bg-white'} divide-y ${getThemeBorderClasses(theme)}`}
+            >
               {filteredSuggestions.map((suggestion, index) => (
                 <tr
                   key={suggestion.id}
-                  className={`hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                  className={`${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-50'} ${
                     index % 2 === 0
-                      ? 'bg-white dark:bg-gray-900'
-                      : 'bg-gray-50 dark:bg-gray-800'
+                      ? theme === 'dark'
+                        ? 'bg-gray-900'
+                        : 'bg-white'
+                      : theme === 'dark'
+                        ? 'bg-gray-800'
+                        : 'bg-gray-50'
                   }`}
                 >
                   {/* First column - Last Updated */}
                   <td
-                    className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white w-32 bg-inherit"
+                    className={`px-4 py-4 whitespace-nowrap text-sm ${getThemeTextClasses(theme)} w-32 bg-inherit`}
                     style={{ position: 'sticky', left: '0px', zIndex: 20 }}
                   >
                     <div>
                       <div className="font-medium">
                         {formatDate(suggestion.dateUpdated)}
                       </div>
-                      <div className="text-gray-500 dark:text-gray-400 text-xs">
+                      <div
+                        className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'} text-xs`}
+                      >
                         {getRelativeTime(suggestion.dateUpdated)}
                       </div>
                     </div>
@@ -151,7 +177,7 @@ const SuggestionTableData = ({
 
                   {/* Second column - Employee */}
                   <td
-                    className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white w-32 bg-inherit"
+                    className={`px-4 py-4 whitespace-nowrap text-sm ${getThemeTextClasses(theme)} w-32 bg-inherit`}
                     style={{ position: 'sticky', left: '128px', zIndex: 20 }}
                   >
                     <button
@@ -161,17 +187,19 @@ const SuggestionTableData = ({
                         );
                         if (employee) handleOpenEmployeeDrawer(employee);
                       }}
-                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors duration-200"
+                      className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'} font-medium transition-colors duration-200 cursor-pointer`}
                     >
                       {getEmployeeName(suggestion.employeeId)}
                     </button>
                   </td>
 
                   {/* Scrollable columns */}
-                  <td className="pl-8 pr-4 py-4 text-sm text-gray-900 dark:text-white w-64">
+                  <td
+                    className={`pl-8 pr-4 py-4 text-sm ${getThemeTextClasses(theme)} w-64`}
+                  >
                     <button
                       onClick={() => handleOpenDetailModal(suggestion)}
-                      className="text-left w-full truncate hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                      className={`text-left w-full truncate ${theme === 'dark' ? 'hover:text-blue-400' : 'hover:text-blue-600'} transition-colors duration-200 cursor-pointer`}
                       title={suggestion.description}
                     >
                       {suggestion.description}
@@ -183,7 +211,9 @@ const SuggestionTableData = ({
                   <td className="px-4 py-4 whitespace-nowrap w-24">
                     {getStatusBadge(suggestion)}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white w-20">
+                  <td
+                    className={`px-4 py-4 whitespace-nowrap text-sm ${getThemeTextClasses(theme)} w-20`}
+                  >
                     <span className="capitalize">{suggestion.source}</span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap w-20">
@@ -193,7 +223,7 @@ const SuggestionTableData = ({
                     <PermissionGuard permission="update_status" admin={admin}>
                       <button
                         onClick={() => handleOpenModal(suggestion)}
-                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
+                        className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'} transition-colors duration-200 cursor-pointer`}
                       >
                         Update
                       </button>

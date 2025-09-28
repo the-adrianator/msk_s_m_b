@@ -6,8 +6,11 @@ import { getCurrentAdmin } from '@/services/authService';
 import LoginScreen from '@/components/LoginScreen';
 import DashboardLayout from '@/components/DashboardLayout';
 import SuggestionTable from '@/components/SuggestionTable';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getThemeTextClasses } from '@/utils/themeClasses';
 
 export default function SuggestionsPage() {
+  const { theme } = useTheme();
   const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -25,7 +28,9 @@ export default function SuggestionsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300">
+      <div
+        className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-gray-300' : 'bg-gray-100 text-gray-700'}`}
+      >
         Loading application...
       </div>
     );
@@ -38,7 +43,7 @@ export default function SuggestionsPage() {
   return (
     <DashboardLayout admin={admin}>
       <div className="w-full overflow-x-hidden">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        <h2 className={`text-2xl font-bold ${getThemeTextClasses(theme)} mb-6`}>
           All Suggestions
         </h2>
         <SuggestionTable admin={admin} />

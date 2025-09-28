@@ -1,6 +1,11 @@
 'use client';
 
 import React from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
+import {
+  getThemeCardClasses,
+  getThemeBorderClasses,
+} from '@/utils/themeClasses';
 
 interface LoadingSkeletonProps {
   lines?: number;
@@ -11,12 +16,14 @@ export default function LoadingSkeleton({
   lines = 3,
   className = '',
 }: LoadingSkeletonProps) {
+  const { theme } = useTheme();
+
   return (
     <div className={`animate-pulse ${className}`}>
       {Array.from({ length: lines }).map((_, index) => (
         <div
           key={index}
-          className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"
+          className={`h-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} rounded mb-2`}
           style={{ width: `${Math.random() * 40 + 60}%` }}
         />
       ))}
@@ -25,15 +32,25 @@ export default function LoadingSkeleton({
 }
 
 export function TableSkeleton() {
+  const { theme } = useTheme();
+
   return (
     <div className="animate-pulse">
       <div className="space-y-4">
         {Array.from({ length: 5 }).map((_, index) => (
           <div key={index} className="flex space-x-4">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/6"></div>
+            <div
+              className={`h-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} rounded w-1/4`}
+            ></div>
+            <div
+              className={`h-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} rounded w-1/4`}
+            ></div>
+            <div
+              className={`h-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} rounded w-1/3`}
+            ></div>
+            <div
+              className={`h-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} rounded w-1/6`}
+            ></div>
           </div>
         ))}
       </div>
@@ -42,17 +59,25 @@ export function TableSkeleton() {
 }
 
 export function CardSkeleton() {
+  const { theme } = useTheme();
+
   return (
     <div className="animate-pulse">
       <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, index) => (
           <div
             key={index}
-            className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+            className={`${getThemeCardClasses(theme)} p-4 rounded-lg border ${getThemeBorderClasses(theme)}`}
           >
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+            <div
+              className={`h-4 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} rounded w-3/4 mb-2`}
+            ></div>
+            <div
+              className={`h-3 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} rounded w-1/2 mb-2`}
+            ></div>
+            <div
+              className={`h-3 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} rounded w-1/4`}
+            ></div>
           </div>
         ))}
       </div>
