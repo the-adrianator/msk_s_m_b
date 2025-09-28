@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Suggestion, Employee } from '@/types';
-import { formatDate, getRelativeTime, isOverdue } from '@/utils/dates';
+import { Suggestion } from '@/types';
+import { getRelativeTime, isOverdue } from '@/utils/dates';
 import { formatCurrency } from '@/utils/currency';
 import { AdminUser } from '@/types';
 import PermissionGuard from './PermissionGuard';

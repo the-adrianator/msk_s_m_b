@@ -281,7 +281,7 @@ export default function DashboardPage({ admin }: DashboardPageProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 items-start">
           {recentSuggestions
             .slice(0, showAllRecent ? recentSuggestions.length : 3)
-            .map((suggestion, index) => (
+            .map(suggestion => (
               <SuggestionCard
                 key={suggestion.id}
                 suggestion={suggestion}

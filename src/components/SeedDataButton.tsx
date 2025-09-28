@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { seedFirestoreData, clearFirestoreData } from '@/scripts/seedData';
+import { seedFirestoreData } from '@/scripts/seedData';
 
 export default function SeedDataButton() {
   const [isLoading, setIsLoading] = useState(false);

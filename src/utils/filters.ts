@@ -43,7 +43,7 @@ export function filterSuggestions(
       const searchTerm = filters.search.toLowerCase();
       const employee = employees?.find(emp => emp.id === suggestion.employeeId);
       const employeeName = employee?.name || '';
-      
+
       const searchableFields = [
         suggestion.description,
         suggestion.type,
@@ -52,9 +52,9 @@ export function filterSuggestions(
         suggestion.source,
         employeeName,
         suggestion.notes || '',
-        suggestion.estimatedCost || ''
+        suggestion.estimatedCost || '',
       ];
-      
+
       const searchableText = searchableFields.join(' ').toLowerCase();
       if (!searchableText.includes(searchTerm)) {
         return false;

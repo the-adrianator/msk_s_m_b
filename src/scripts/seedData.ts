@@ -1,6 +1,5 @@
 import { collection, addDoc, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Employee, Suggestion } from '@/types';
 import expandedSampleData from '../../expanded_sample_data.json';
 
 /**

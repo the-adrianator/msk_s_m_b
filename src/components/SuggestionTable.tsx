@@ -12,7 +12,6 @@ import { getSuggestions } from '@/services/suggestionService';
 import { getEmployees } from '@/services/employeeService';
 import { filterSuggestions, sortSuggestions } from '@/utils/filters';
 import { formatDate, getRelativeTime, isOverdue } from '@/utils/dates';
-import { formatCurrency } from '@/utils/currency';
 import { AdminUser } from '@/types';
 import PermissionGuard from './PermissionGuard';
 import StatusUpdateModal from './StatusUpdateModal';
@@ -133,10 +132,6 @@ export default function SuggestionTable({ admin }: SuggestionTableProps) {
       type: 'success',
       isVisible: true,
     });
-  };
-
-  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
-    setToast({ message, type, isVisible: true });
   };
 
   const hideToast = () => {

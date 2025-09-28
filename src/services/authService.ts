@@ -28,10 +28,7 @@ const MOCK_ADMINS: AdminUser[] = [
  * @param password - User password (any password works in mock)
  * @returns Promise<AdminUser | null> - Admin user if valid, null if invalid
  */
-export async function mockSignIn(
-  email: string,
-  _password: string
-): Promise<AdminUser | null> {
+export async function mockSignIn(email: string): Promise<AdminUser | null> {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 1000));
 

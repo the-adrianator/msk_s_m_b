@@ -39,15 +39,6 @@ describe('createSuggestion', () => {
       description: 'Test suggestion',
     };
 
-    // In a real implementation, these would be set by the service
-    const expectedDefaults = {
-      status: 'pending',
-      source: 'admin',
-      createdBy: 'hsmanager@company.com',
-      dateCreated: expect.any(String),
-      dateUpdated: expect.any(String),
-    };
-
     // This test verifies the structure we expect
     expect(suggestionData).toMatchObject({
       employeeId: 'emp1',

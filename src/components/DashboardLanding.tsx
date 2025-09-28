@@ -1,27 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { AdminUser, Suggestion } from '@/types';
+import { AdminUser } from '@/types';
 import PermissionGuard from './PermissionGuard';
 import SuggestionTable from './SuggestionTable';
 import CreateSuggestionModal from './CreateSuggestionModal';
-import SeedDataButton from './SeedDataButton';
 
 interface DashboardLandingProps {
   admin: AdminUser;
-  onLogout: () => void;
 }
 
 type ViewMode = 'landing' | 'suggestions' | 'create';
 
-export default function DashboardLanding({
-  admin,
-  onLogout,
-}: DashboardLandingProps) {
+export default function DashboardLanding({ admin }: DashboardLandingProps) {
   const [currentView, setCurrentView] = useState<ViewMode>('landing');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  const handleCreateSuggestion = (newSuggestion: Suggestion) => {
+  const handleCreateSuggestion = () => {
     // This will be handled by the SuggestionTable component
     setCurrentView('suggestions');
     setIsCreateModalOpen(false);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Employee, Suggestion } from '@/types';
 import { getSuggestionsByEmployee } from '@/services/suggestionService';
 import { formatDate } from '@/utils/dates';
@@ -20,13 +20,7 @@ export default function EmployeeDrawer({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (employee && isOpen) {
-      loadEmployeeSuggestions();
-    }
-  }, [employee, isOpen]);
-
-  const loadEmployeeSuggestions = async () => {
+  const loadEmployeeSuggestions = useCallback(async () => {
     if (!employee) return;
 
     setIsLoading(true);
@@ -40,7 +34,13 @@ export default function EmployeeDrawer({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [employee]);
+
+  useEffect(() => {
+    if (employee && isOpen) {
+      loadEmployeeSuggestions();
+    }
+  }, [employee, isOpen, loadEmployeeSuggestions]);
 
   const getRiskLevelColor = (riskLevel: string) => {
     switch (riskLevel) {

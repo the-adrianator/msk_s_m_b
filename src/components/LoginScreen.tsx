@@ -20,13 +20,13 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     setError('');
 
     try {
-      const admin = await mockSignIn(email, password);
+      const admin = await mockSignIn(email);
       if (admin) {
         onLogin(admin);
       } else {
         setError('Invalid email or password');
       }
-    } catch (_err) {
+    } catch {
       setError('Login failed. Please try again.');
     } finally {
       setIsLoading(false);

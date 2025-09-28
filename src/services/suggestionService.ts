@@ -94,10 +94,7 @@ export async function getSuggestionsByEmployee(
 ): Promise<Suggestion[]> {
   try {
     const suggestionsRef = collection(db, COLLECTION_NAME);
-    const q = query(
-      suggestionsRef,
-      where('employeeId', '==', employeeId)
-    );
+    const q = query(suggestionsRef, where('employeeId', '==', employeeId));
     const querySnapshot = await getDocs(q);
 
     const suggestions = querySnapshot.docs.map(doc => ({
@@ -116,8 +113,9 @@ export async function getSuggestionsByEmployee(
     })) as Suggestion[];
 
     // Sort by dateUpdated in descending order (most recent first)
-    return suggestions.sort((a, b) => 
-      new Date(b.dateUpdated).getTime() - new Date(a.dateUpdated).getTime()
+    return suggestions.sort(
+      (a, b) =>
+        new Date(b.dateUpdated).getTime() - new Date(a.dateUpdated).getTime()
     );
   } catch (error) {
     console.error('Error fetching suggestions by employee:', error);
